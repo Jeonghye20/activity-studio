@@ -36,6 +36,21 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Claude Code
+.claude_studio/
+
+# Screenshot scripts
+ss.cjs
+ss_scope.cjs
+ss_v27_full.cjs
+ss_v27_survey.cjs
+
+# Reference screens (large binary files)
+screens/
+screens.zip
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

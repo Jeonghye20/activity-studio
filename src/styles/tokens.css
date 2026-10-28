@@ -1,0 +1,60 @@
+/* ──────────────────────────────────────────────
+   디자인 토큰 — 이 파일만 고치면 전체 스타일이 바뀝니다.
+   색·반경·간격은 컴포넌트에 직접 쓰지 말고 var()로 참조하세요.
+────────────────────────────────────────────── */
+
+:root {
+  /* 텍스트 */
+  --ink:   #172036;
+  --ink-2: #3a4560;
+  --ink-3: #5d6880;
+
+  /* 선·면 */
+  --line:    #e3e7ef;
+  --line-2:  #eef1f6;
+  --canvas:  #f3f5fa;
+  --surface: #fff;
+
+  /* 강조 */
+  --signal:     #ffd43b;
+  --signal-ink: #6b4d00;
+
+  /* 사이드바 배경 */
+  --side: #131c33;
+
+  /* 유형 색 (색약 검증 통과 순서) */
+  --concept:    #4263eb;
+  --practice:   #0ca678;
+  --mystery:    #7048e8;
+  --escape:     #e8890c;
+  --analysis:   #1098ad;
+  --discussion: #d6336c;
+
+  /* 상태 색 — 반드시 아이콘 또는 글자와 함께 사용 */
+  --st-done: #2b8a3e;
+  --st-work: #4c6ef5;
+  --st-help: #e03131;
+  --st-off:  #c5ccd8;
+
+  /* 모서리 반경 */
+  --r-lg: 20px;
+  --r-md: 14px;
+  --r-sm: 10px;
+
+  /* ── 구버전 호환 별명 (3단계 완료 후 제거) ── */
+  --navy:    #172036;
+  --navy2:   #2e3d63;
+  --sub:     #3a4560;
+  --mute:    #5d6880;
+  --line2:   #e3e7ef;
+  --soft:    #f3f5fa;
+  --bg:      #f3f5fa;
+  --sel:     #e7eef8;
+  --yellow:  #ffd43b;
+  --good:    #2b8a3e;
+  --goodbg:  #e6f4ec;
+  --bad:     #e03131;
+  --badbg:   #fbeceb;
+  --warn:    #6b4d00;
+  --warnbg:  #fff4d6;
+}
