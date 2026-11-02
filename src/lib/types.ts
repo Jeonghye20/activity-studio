@@ -10,7 +10,8 @@ export type TypeKey =
   | 'mystery'
   | 'escape'
   | 'analysis'
-  | 'discussion';
+  | 'discussion'
+  | 'free';
 
 export interface TypeInfo {
   name: string;   // 화면에 표시할 이름
@@ -110,6 +111,21 @@ export const TYPES: Record<TypeKey, TypeInfo> = {
       '...1222221..',
       '...111111.1.',
       '..........1.',
+    ],
+  },
+  free: {
+    name: '자유형', c: '#8a9bb5', d: '유형 없이 자유롭게 구성', n: 0,
+    art: [
+      '............',
+      '.1111111111.',
+      '.1........1.',
+      '.1........1.',
+      '.1...11...1.',
+      '.1...11...1.',
+      '.1........1.',
+      '.1........1.',
+      '.1111111111.',
+      '............',
     ],
   },
 };

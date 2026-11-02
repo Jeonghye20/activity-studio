@@ -10,6 +10,7 @@ const TYPE_COLOR: Record<WorksheetType, string> = {
   practice:   '#1e7a46',
   analysis:   '#0e7490',
   discussion: '#9d174d',
+  free:       '#5d6880',
 };
 
 const TYPE_CHIP_BG: Record<WorksheetType, string> = {
@@ -19,6 +20,7 @@ const TYPE_CHIP_BG: Record<WorksheetType, string> = {
   practice:   '#d1fae5',
   analysis:   '#cffafe',
   discussion: '#fce7f3',
+  free:       '#eef1f6',
 };
 
 interface Props {

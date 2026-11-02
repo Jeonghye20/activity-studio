@@ -91,6 +91,13 @@ export function TypeIconPaths({ type, color }: { type: TypeKey; color: string })
         <line x1="54" y1="40" x2="72" y2="40" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
       </>
     );
+    case 'free': return (
+      <>
+        <rect x="22" y="12" width="52" height="40" rx="8" stroke={color} strokeWidth="2.5" fill="none" strokeDasharray="7 4" opacity=".7"/>
+        <line x1="48" y1="24" x2="48" y2="40" stroke={color} strokeWidth="2.5" strokeLinecap="round" opacity=".65"/>
+        <line x1="34" y1="32" x2="62" y2="32" stroke={color} strokeWidth="2.5" strokeLinecap="round" opacity=".65"/>
+      </>
+    );
   }
 }
 

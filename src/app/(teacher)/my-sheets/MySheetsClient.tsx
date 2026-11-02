@@ -222,7 +222,7 @@ export default function MySheetsClient() {
 }
 
 /* ── 활동지 카드 ── */
-function SheetCard({ sheet, deployed }: { sheet: MySavedSheet; deployed?: boolean }) {
+export function SheetCard({ sheet, deployed }: { sheet: MySavedSheet; deployed?: boolean }) {
   const badge = sheet.source === 'edit'   ? '✏️ 수정본'
     : sheet.source === 'create' ? '➕ 직접만든'
     : '🔖 책갈피';
@@ -243,14 +243,22 @@ function SheetCard({ sheet, deployed }: { sheet: MySavedSheet; deployed?: boolea
         )}
         <div className="row" style={{ marginTop: 'auto', paddingTop: 6, gap: 8 }}>
           <Link
-            href={`/worksheets/${sheet.worksheetId}/deploy`}
+            href={
+              sheet.source === 'create'
+                ? `/worksheets/${sheet.id}/deploy`
+                : `/worksheets/${sheet.worksheetId}/deploy`
+            }
             className="btn sm ghost"
             style={{ textDecoration: 'none', flex: 1, justifyContent: 'center' }}
           >
             배포하기
           </Link>
           <Link
-            href={`/worksheets/${sheet.worksheetId}`}
+            href={
+              sheet.source === 'create'
+                ? `/my-sheets/new/edit?id=${sheet.id}&view=student`
+                : `/worksheets/${sheet.worksheetId}`
+            }
             className="btn sm ghost"
             style={{ textDecoration: 'none', flex: 1, justifyContent: 'center' }}
           >

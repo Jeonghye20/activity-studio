@@ -1,4 +1,4 @@
-export type WorksheetType = 'concept' | 'escape' | 'mystery' | 'practice' | 'analysis' | 'discussion';
+export type WorksheetType = 'concept' | 'escape' | 'mystery' | 'practice' | 'analysis' | 'discussion' | 'free';
 export type SectionRole = 'start' | 'main' | 'wrap';
 export type Situation = 'wrap' | 'quiz' | 'level' | 'focus';
 
@@ -78,6 +78,7 @@ export const TYPE_LABEL: Record<WorksheetType, string> = {
   practice: '실습 기록',
   analysis: '자료 분석',
   discussion: '토론·의견',
+  free: '자유형',
 };
 
 export const TYPE_GAME: Record<WorksheetType, boolean> = {
@@ -87,4 +88,5 @@ export const TYPE_GAME: Record<WorksheetType, boolean> = {
   practice: false,
   analysis: false,
   discussion: false,
+  free: false,
 };

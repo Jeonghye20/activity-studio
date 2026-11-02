@@ -139,7 +139,13 @@ export default function NewSheetClient() {
             </button>
             <button
               className="btn primary"
-              onClick={nextStep}
+              onClick={() => {
+                if (selectedType === 'concept' || selectedType === 'free') {
+                  router.push(`/my-sheets/new/edit?type=${selectedType}`);
+                } else {
+                  nextStep();
+                }
+              }}
               disabled={!selectedType}
             >
               다음: 채우기
