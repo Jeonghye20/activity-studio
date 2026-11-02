@@ -2,9 +2,16 @@
 
 import { useState } from 'react';
 import type { ChoiceBlock as T } from '../types';
-import { DASHED, DASHED_FOCUS, AiField, XBtn } from './BlockWrapper';
+import { DASHED, DASHED_FOCUS, XBtn } from './BlockWrapper';
 
 interface Props { block: T; onChange: (u: Partial<T>) => void; studentView: boolean; }
+
+const aiBadge: React.CSSProperties = {
+  position: 'absolute', right: 8, top: 8,
+  height: 20, padding: '0 7px', borderRadius: 10,
+  background: '#7048e8', color: '#fff', fontSize: 11, fontWeight: 800,
+  display: 'inline-flex', alignItems: 'center', pointerEvents: 'none',
+};
 
 export default function ChoiceBlock({ block, onChange, studentView }: Props) {
   const [focusIdx, setFocusIdx] = useState(-1);
@@ -53,17 +60,18 @@ export default function ChoiceBlock({ block, onChange, studentView }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {block.opts.map((o, i) => {
           const isAns = block.ans === i;
+          const aiActive = aiOpts || (aiAns && isAns);
           return (
-            <AiField key={i} active={aiOpts || (aiAns && isAns)}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <button
-                  onClick={() => setAns(i)}
-                  style={{
-                    width: 30, height: 30, borderRadius: 8, border: `1.5px solid ${isAns ? '#2b8a3e' : '#e3e7ef'}`,
-                    background: isAns ? '#ebfbee' : '#eef1f6', color: isAns ? '#2b8a3e' : '#172036',
-                    fontSize: 13, fontWeight: 850, cursor: 'pointer', flexShrink: 0,
-                  }}
-                >{i + 1}</button>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                onClick={() => setAns(i)}
+                style={{
+                  width: 30, height: 30, borderRadius: 8, border: `1.5px solid ${isAns ? '#2b8a3e' : '#e3e7ef'}`,
+                  background: isAns ? '#ebfbee' : '#eef1f6', color: isAns ? '#2b8a3e' : '#172036',
+                  fontSize: 13, fontWeight: 850, cursor: 'pointer', flexShrink: 0,
+                }}
+              >{i + 1}</button>
+              <div style={{ flex: 1, position: 'relative' }}>
                 <input
                   value={o}
                   onChange={e => setOpt(i, e.target.value)}
@@ -71,14 +79,16 @@ export default function ChoiceBlock({ block, onChange, studentView }: Props) {
                   onBlur={() => setFocusIdx(-1)}
                   placeholder={`보기 ${i + 1}`}
                   style={{
-                    ...DASHED, flex: 1, height: 38,
-                    background: (aiOpts || (aiAns && isAns)) ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'),
+                    ...DASHED, width: '100%', height: 38,
+                    background: aiActive ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'),
                     ...(focusIdx === i ? DASHED_FOCUS : {}),
+                    ...(aiActive ? { paddingRight: 38 } : {}),
                   }}
                 />
-                {block.opts.length > 2 && <XBtn onClick={() => removeOpt(i)} />}
+                {aiActive && <span style={aiBadge}>AI</span>}
               </div>
-            </AiField>
+              {block.opts.length > 2 && <XBtn onClick={() => removeOpt(i)} />}
+            </div>
           );
         })}
       </div>

@@ -75,24 +75,26 @@ export default function LineBlock({ block, onChange, studentView }: Props) {
       {/* Pairs */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {block.pairs.map((p, i) => (
-          <AiField key={i} active={aiPairs}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 24px 1fr 28px', gap: 8, alignItems: 'center' }}>
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 24px 1fr 28px', gap: 8, alignItems: 'center' }}>
+            <AiField active={aiPairs}>
               <input value={p[0]} onChange={e => setPair(i, 0, e.target.value)}
                 onFocus={() => setFocusKey(`l${i}`)} onBlur={() => setFocusKey('')}
                 placeholder={`왼쪽 ${i + 1}`}
-                style={{ ...DASHED, height: 38, background: aiPairs ? '#f3f0ff' : (focusKey === `l${i}` ? '#fff' : '#fbfcfe'), ...(focusKey === `l${i}` ? DASHED_FOCUS : {}) }}
+                style={{ ...DASHED, height: 38, background: aiPairs ? '#f3f0ff' : (focusKey === `l${i}` ? '#fff' : '#fbfcfe'), ...(focusKey === `l${i}` ? DASHED_FOCUS : {}), ...(aiPairs ? { paddingRight: 38 } : {}) }}
               />
-              <span style={{ textAlign: 'center', color: '#a3abbb', fontSize: 13 }}>——</span>
+            </AiField>
+            <span style={{ textAlign: 'center', color: '#a3abbb', fontSize: 13 }}>——</span>
+            <AiField active={aiPairs}>
               <input value={p[1]} onChange={e => setPair(i, 1, e.target.value)}
                 onFocus={() => setFocusKey(`r${i}`)} onBlur={() => setFocusKey('')}
                 placeholder={`오른쪽 ${i + 1}`}
-                style={{ ...DASHED, height: 38, background: aiPairs ? '#f3f0ff' : (focusKey === `r${i}` ? '#fff' : '#fbfcfe'), ...(focusKey === `r${i}` ? DASHED_FOCUS : {}) }}
+                style={{ ...DASHED, height: 38, background: aiPairs ? '#f3f0ff' : (focusKey === `r${i}` ? '#fff' : '#fbfcfe'), ...(focusKey === `r${i}` ? DASHED_FOCUS : {}), ...(aiPairs ? { paddingRight: 38 } : {}) }}
               />
-              {block.pairs.length > 2 ? (
-                <button onClick={() => removePair(i)} style={{ width: 24, height: 24, border: '1px solid #ffc9c9', borderRadius: 6, background: '#fff5f5', color: '#c92a2a', fontSize: 14, cursor: 'pointer' }}>×</button>
-              ) : <span />}
-            </div>
-          </AiField>
+            </AiField>
+            {block.pairs.length > 2 ? (
+              <button onClick={() => removePair(i)} style={{ width: 24, height: 24, border: '1px solid #ffc9c9', borderRadius: 6, background: '#fff5f5', color: '#c92a2a', fontSize: 14, cursor: 'pointer' }}>×</button>
+            ) : <span />}
+          </div>
         ))}
       </div>
       {block.pairs.length < 5 && (

@@ -2,17 +2,25 @@
 
 import { useState } from 'react';
 import type { SortBlock as T } from '../types';
-import { DASHED, DASHED_FOCUS, AiField } from './BlockWrapper';
+import { DASHED, DASHED_FOCUS, XBtn } from './BlockWrapper';
 
 interface Props { block: T; onChange: (u: Partial<T>) => void; studentView: boolean; }
+
+const aiBadge: React.CSSProperties = {
+  position: 'absolute', right: 8, top: 8,
+  height: 20, padding: '0 7px', borderRadius: 10,
+  background: '#7048e8', color: '#fff', fontSize: 11, fontWeight: 800,
+  display: 'inline-flex', alignItems: 'center', pointerEvents: 'none',
+};
 
 export default function SortBlock({ block, onChange, studentView }: Props) {
   const [focusKey, setFocusKey] = useState('');
   const aiItems = block.aiFields?.includes('items');
+  const aiG     = block.aiFields?.includes('g');
 
   function setGroupName(i: 0 | 1, v: string) {
     const g: [string, string] = [...block.g] as [string, string]; g[i] = v;
-    onChange({ g });
+    onChange({ g, aiFields: block.aiFields?.filter(f => f !== 'g') });
   }
 
   function setItem(i: number, v: string) {
@@ -20,13 +28,8 @@ export default function SortBlock({ block, onChange, studentView }: Props) {
     onChange({ items, aiFields: block.aiFields?.filter(f => f !== 'items') });
   }
 
-  function setGi(i: number, g: 0 | 1) {
-    const gi = [...block.gi]; gi[i] = g;
-    onChange({ gi });
-  }
-
-  function addItem() {
-    onChange({ items: [...block.items, ''], gi: [...block.gi, 0] });
+  function addItemToGroup(g: 0 | 1) {
+    onChange({ items: [...block.items, ''], gi: [...block.gi, g] });
   }
 
   function removeItem(i: number) {
@@ -58,50 +61,43 @@ export default function SortBlock({ block, onChange, studentView }: Props) {
   return (
     <div>
       <p style={{ margin: '0 0 10px', fontSize: 13, color: '#5d6880' }}>학생에게는 항목이 섞여서 보여요.</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {([0, 1] as const).map(gi => (
-          <div key={gi} style={{ border: '1.5px solid #e3e7ef', borderRadius: 12, padding: 12 }}>
-            <input
-              value={block.g[gi]}
-              onChange={e => setGroupName(gi, e.target.value)}
-              placeholder={`묶음 ${gi + 1} 이름`}
-              style={{ ...DASHED, height: 36, marginBottom: 8, fontWeight: 700 }}
-            />
+          <div key={gi} style={{ border: '1.5px solid #e3e7ef', borderRadius: 12, padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* 묶음 이름 */}
+            <div style={{ position: 'relative' }}>
+              <input
+                value={block.g[gi]}
+                onChange={e => setGroupName(gi, e.target.value)}
+                onFocus={() => setFocusKey(`g${gi}`)} onBlur={() => setFocusKey('')}
+                placeholder={`묶음 ${gi + 1} 이름`}
+                style={{ ...DASHED, height: 36, fontWeight: 700, width: '100%', background: aiG ? '#f3f0ff' : (focusKey === `g${gi}` ? '#fff' : '#fbfcfe'), ...(focusKey === `g${gi}` ? DASHED_FOCUS : {}), ...(aiG ? { paddingRight: 38 } : {}) }}
+              />
+              {aiG && <span style={aiBadge}>AI</span>}
+            </div>
+            {/* 이 묶음에 속하는 항목들 */}
             {block.items.map((item, i) => block.gi[i] === gi && (
-              <div key={i} style={{ padding: '5px 8px', borderRadius: 8, background: '#f3f5fa', fontSize: 13, marginBottom: 4 }}>{item || `(항목 ${i + 1})`}</div>
+              <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <div style={{ flex: 1, position: 'relative' }}>
+                  <input
+                    value={item}
+                    onChange={e => setItem(i, e.target.value)}
+                    onFocus={() => setFocusKey(`i${i}`)} onBlur={() => setFocusKey('')}
+                    placeholder={`항목 ${i + 1}`}
+                    style={{ ...DASHED, height: 36, width: '100%', background: aiItems ? '#f3f0ff' : (focusKey === `i${i}` ? '#fff' : '#fbfcfe'), ...(focusKey === `i${i}` ? DASHED_FOCUS : {}), ...(aiItems ? { paddingRight: 38 } : {}) }}
+                  />
+                  {aiItems && <span style={aiBadge}>AI</span>}
+                </div>
+                <XBtn onClick={() => removeItem(i)} />
+              </div>
             ))}
+            <button
+              onClick={() => addItemToGroup(gi)}
+              style={{ height: 32, border: '1.5px dashed #c7cedb', borderRadius: 8, background: 'none', fontSize: 13, color: '#5d6880', cursor: 'pointer' }}
+            >+ 항목 추가</button>
           </div>
         ))}
       </div>
-      <AiField active={aiItems}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {block.items.map((item, i) => (
-            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <input
-                value={item}
-                onChange={e => setItem(i, e.target.value)}
-                onFocus={() => setFocusKey(`i${i}`)} onBlur={() => setFocusKey('')}
-                placeholder={`항목 ${i + 1}`}
-                style={{ ...DASHED, flex: 1, height: 38, background: aiItems ? '#f3f0ff' : (focusKey === `i${i}` ? '#fff' : '#fbfcfe'), ...(focusKey === `i${i}` ? DASHED_FOCUS : {}) }}
-              />
-              <select
-                value={block.gi[i]}
-                onChange={e => setGi(i, Number(e.target.value) as 0 | 1)}
-                style={{ height: 38, border: '1.5px solid #e3e7ef', borderRadius: 8, padding: '0 8px', fontSize: 13, background: '#fff' }}
-              >
-                <option value={0}>{block.g[0] || '묶음 1'}</option>
-                <option value={1}>{block.g[1] || '묶음 2'}</option>
-              </select>
-              {block.items.length > 2 && (
-                <button onClick={() => removeItem(i)} style={{ width: 24, height: 24, border: '1px solid #ffc9c9', borderRadius: 6, background: '#fff5f5', color: '#c92a2a', fontSize: 14, cursor: 'pointer' }}>×</button>
-              )}
-            </div>
-          ))}
-        </div>
-      </AiField>
-      <button onClick={addItem} style={{ marginTop: 8, height: 34, padding: '0 12px', borderRadius: 8, border: '1.5px dashed #c7cedb', background: 'none', fontSize: 13, color: '#5d6880', cursor: 'pointer' }}>
-        + 항목 추가
-      </button>
     </div>
   );
 }

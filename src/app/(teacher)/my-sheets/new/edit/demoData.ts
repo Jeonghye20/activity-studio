@@ -1,4 +1,4 @@
-import type { Sheet, Block, SheetType, ChoiceBlock, MultiBlock, PictureBlock, OrderBlock, WriteBlock, OxBlock, BlankBlock, LineBlock, SortBlock, DataBlock, LockBlock, OpinionBlock } from './types';
+import type { Sheet, Block, SheetType, ChoiceBlock, MultiBlock, PictureBlock, OrderBlock, WriteBlock, OxBlock, BlankBlock, LineBlock, SortBlock as SortT, DataBlock, LockBlock, OpinionBlock } from './types';
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -146,7 +146,7 @@ export const AI_FILL_FREE_6: {
     unit: 'Ⅰ-2-02 개인정보 보호와 정보 보안',
     title: '해킹당하지 않는 비밀번호 만들기',
     goal: '안전한 비밀번호의 조건을 알고, 자료를 근거로 나만의 비밀번호 규칙을 만들 수 있다.',
-    img: '',
+    img: 'ai-free',
   },
   blocks: [
     {
@@ -189,7 +189,7 @@ export const AI_FILL_FREE_6: {
       ],
       a: '대·소문자, 숫자, 기호를 섞은 12자리 비밀번호. 길고 문자 종류가 많을수록 알아내는 데 오래 걸리기 때문이다.',
       hint: '자리 수와 문자 종류, 두 가지를 같이 보세요.', hintOn: true,
-      aiMade: true, aiFields: ['q', 'rows', 'a', 'hint'],
+      aiMade: true, aiFields: ['q', 'cols', 'rows', 'a', 'hint'],
     } as DataBlock,
     {
       id: uid(), type: 'lock',
@@ -211,6 +211,18 @@ export const AI_FILL_FREE_6: {
       aiMade: true, aiFields: ['q', 'st', 'ex'],
     } as OpinionBlock,
   ],
+};
+
+/* ─ AI 채우기: 자유형 7개용 분류하기 블록 ─ */
+export const AI_FILL_FREE_7_SORT: SortT = {
+  id: uid(), type: 'sort',
+  q: '개인정보인 것과 아닌 것으로 나누세요.',
+  g: ['개인정보다', '개인정보가 아니다'],
+  items: ['휴대폰 번호', '집 주소', '오늘 날씨', '학교 급식 메뉴'],
+  gi: [0, 0, 1, 1],
+  hint: '', hintOn: false,
+  aiMade: true, aiAnswered: true, aiChecked: false,
+  aiFields: ['q', 'g', 'items'],
 };
 
 /* ─ 자유형 문항 수별 기본 구성 ─ */

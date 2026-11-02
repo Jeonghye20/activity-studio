@@ -81,47 +81,47 @@ export default function PictureBlock({ block, onChange, studentView }: Props) {
           const AiImg = item.img ? AI_SVGS[item.img] : null;
           const isAiImg = !!AiImg;
           return (
-            <AiField key={i} active={!studentView && aiItems}>
-              <div style={{ border: `1.5px ${studentView ? 'solid' : 'dashed'} #c7cedb`, borderRadius: 12, overflow: 'hidden', background: '#fbfcfe' }}>
-                {/* 이미지 영역 */}
-                <div style={{ background: isAiImg ? '#f8f9fa' : '#eef1f6', minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  {isAiImg ? (
-                    <>
-                      <AiImg />
-                      {/* AI 그림 배지 */}
-                      <span style={{ position: 'absolute', bottom: 5, right: 5, height: 18, padding: '0 6px', borderRadius: 9, background: '#7048e8', color: '#fff', fontSize: 10, fontWeight: 800, display: 'inline-flex', alignItems: 'center', pointerEvents: 'none' }}>AI 그림</span>
-                    </>
-                  ) : (
-                    item.img
-                      ? <span style={{ fontSize: 32 }}>🖼️</span>
-                      : studentView
-                        ? <span style={{ fontSize: 12, color: '#a3abbb' }}>AI가 만든 그림이 들어가요</span>
-                        : <span style={{ fontSize: 12, color: '#a3abbb' }}>이미지 없음</span>
-                  )}
-                  {!studentView && (
-                    <div style={{ position: 'absolute', right: 4, top: 4 }}>
-                      <XBtn onClick={() => removeCard(i)} />
-                    </div>
-                  )}
-                </div>
-                {/* 정답 칸 */}
-                <div style={{ padding: 8 }}>
-                  <p style={{ margin: '0 0 4px', fontSize: 11.5, fontWeight: 700, color: '#5d6880' }}>정답</p>
-                  {studentView ? (
-                    <div style={{ height: 36, border: '1.5px solid #e3e7ef', borderRadius: 8, background: '#fff' }} />
-                  ) : (
+            <div key={i} style={{ border: `1.5px ${studentView ? 'solid' : 'dashed'} #c7cedb`, borderRadius: 12, overflow: 'hidden', background: '#fbfcfe' }}>
+              {/* 이미지 영역 */}
+              <div style={{ background: isAiImg ? '#f8f9fa' : '#eef1f6', minHeight: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                {isAiImg ? (
+                  <>
+                    <AiImg />
+                    {/* AI 그림 배지 */}
+                    <span style={{ position: 'absolute', bottom: 5, right: 5, height: 18, padding: '0 6px', borderRadius: 9, background: '#7048e8', color: '#fff', fontSize: 10, fontWeight: 800, display: 'inline-flex', alignItems: 'center', pointerEvents: 'none' }}>AI 그림</span>
+                  </>
+                ) : (
+                  item.img
+                    ? <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="4" stroke="#4a5563" strokeWidth="1.8"/><circle cx="9.5" cy="9.5" r="2.5" stroke="#4a5563" strokeWidth="1.5"/><path d="M2 19l6-6 5 5 5-5 8 8" stroke="#4a5563" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    : studentView
+                      ? <span style={{ fontSize: 12, color: '#a3abbb' }}>AI가 만든 그림이 들어가요</span>
+                      : <span style={{ fontSize: 12, color: '#a3abbb' }}>이미지 없음</span>
+                )}
+                {!studentView && (
+                  <div style={{ position: 'absolute', right: 4, top: 4 }}>
+                    <XBtn onClick={() => removeCard(i)} />
+                  </div>
+                )}
+              </div>
+              {/* 정답 칸 */}
+              <div style={{ padding: 8 }}>
+                <p style={{ margin: '0 0 4px', fontSize: 11.5, fontWeight: 700, color: '#5d6880' }}>정답</p>
+                {studentView ? (
+                  <div style={{ height: 36, border: '1.5px solid #e3e7ef', borderRadius: 8, background: '#fff' }} />
+                ) : (
+                  <AiField active={aiItems}>
                     <input
                       value={item.a}
                       onChange={e => updateItem(i, { a: e.target.value })}
                       onFocus={() => setFocusIdx(i)}
                       onBlur={() => setFocusIdx(-1)}
                       placeholder="정답"
-                      style={{ ...DASHED, height: 36, background: aiItems ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'), ...(focusIdx === i ? DASHED_FOCUS : {}) }}
+                      style={{ ...DASHED, height: 36, background: aiItems ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'), ...(focusIdx === i ? DASHED_FOCUS : {}), ...(aiItems ? { paddingRight: 38 } : {}) }}
                     />
-                  )}
-                </div>
+                  </AiField>
+                )}
               </div>
-            </AiField>
+            </div>
           );
         })}
         {/* 추가 카드 */}

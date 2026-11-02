@@ -5,8 +5,6 @@ import type { OxBlock as T } from '../types';
 interface Props { block: T; onChange: (u: Partial<T>) => void; studentView: boolean; }
 
 export default function OxBlock({ block, onChange, studentView }: Props) {
-  const aiAns = block.aiFields?.includes('ans');
-
   function pick(v: 'O' | 'X') {
     if (studentView) return;
     onChange({ ans: v, aiAnswered: false, aiChecked: false });
@@ -27,23 +25,19 @@ export default function OxBlock({ block, onChange, studentView }: Props) {
       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
         {(['O', 'X'] as const).map(v => {
           const isOn = selected === v;
-          const col = v === 'O' ? '#2b8a3e' : '#c92a2a';
           return (
             <button
               key={v}
               onClick={() => pick(v)}
               style={{
                 ...btnBase,
-                borderColor: isOn ? col : '#e3e7ef',
-                background: isOn ? (v === 'O' ? '#ebfbee' : '#fff5f5') : '#f9fafb',
-                color: isOn ? col : '#c5ccd8',
+                borderColor: isOn ? '#2b8a3e' : '#e3e7ef',
+                background: isOn ? '#ebfbee' : '#f9fafb',
+                color: isOn ? '#2b8a3e' : '#c5ccd8',
               }}
             >{v}</button>
           );
         })}
-        {!studentView && aiAns && block.ans && (
-          <span style={{ fontSize: 13, color: '#7048e8', fontWeight: 700 }}>AI가 선택한 정답</span>
-        )}
       </div>
     </div>
   );

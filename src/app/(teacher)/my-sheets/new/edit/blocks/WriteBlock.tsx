@@ -64,18 +64,20 @@ export default function WriteBlock({ block, onChange, studentView }: Props) {
         </div>
       </div>
       {/* 예시 답 */}
-      <AiField active={aiEx}>
+      <div>
         <label style={{ fontSize: 13, fontWeight: 700, color: '#5d6880', display: 'block', marginBottom: 4 }}>예시 답 (학생에게는 보이지 않아요)</label>
-        <textarea
-          value={block.ex}
-          onChange={e => { onChange({ ex: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'ex') }); autoResize(e.target); }}
-          onFocus={() => setExFocus(true)} onBlur={() => setExFocus(false)}
-          ref={el => { if (el) autoResize(el); }}
-          placeholder="예시 답안을 입력하세요"
-          rows={2}
-          style={{ ...DASHED, resize: 'none', overflow: 'hidden', minHeight: 56, background: aiEx ? '#f3f0ff' : (exFocus ? '#fff' : '#fbfcfe'), ...(exFocus ? DASHED_FOCUS : {}) }}
-        />
-      </AiField>
+        <AiField active={aiEx}>
+          <textarea
+            value={block.ex}
+            onChange={e => { onChange({ ex: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'ex') }); autoResize(e.target); }}
+            onFocus={() => setExFocus(true)} onBlur={() => setExFocus(false)}
+            ref={el => { if (el) autoResize(el); }}
+            placeholder="예시 답안을 입력하세요"
+            rows={2}
+            style={{ ...DASHED, resize: 'none', overflow: 'hidden', minHeight: 56, background: aiEx ? '#f3f0ff' : (exFocus ? '#fff' : '#fbfcfe'), ...(exFocus ? DASHED_FOCUS : {}), ...(aiEx ? { paddingRight: 38 } : {}) }}
+          />
+        </AiField>
+      </div>
     </div>
   );
 }

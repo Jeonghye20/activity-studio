@@ -15,15 +15,17 @@ export default function ShortBlock({ block, onChange, studentView }: Props) {
   }
 
   return (
-    <AiField active={aiA}>
+    <div>
       <label style={{ fontSize: 13, fontWeight: 700, color: '#5d6880', display: 'block', marginBottom: 6 }}>정답</label>
-      <input
-        value={block.a}
-        onChange={e => onChange({ a: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'a') })}
-        onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
-        placeholder="정답 또는 모범 답안"
-        style={{ ...DASHED, height: 42, background: aiA ? '#f3f0ff' : (focus ? '#fff' : '#fbfcfe'), ...(focus ? DASHED_FOCUS : {}) }}
-      />
-    </AiField>
+      <AiField active={aiA}>
+        <input
+          value={block.a}
+          onChange={e => onChange({ a: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'a') })}
+          onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+          placeholder="정답 또는 모범 답안"
+          style={{ ...DASHED, height: 42, background: aiA ? '#f3f0ff' : (focus ? '#fff' : '#fbfcfe'), ...(focus ? DASHED_FOCUS : {}), ...(aiA ? { paddingRight: 38 } : {}) }}
+        />
+      </AiField>
+    </div>
   );
 }

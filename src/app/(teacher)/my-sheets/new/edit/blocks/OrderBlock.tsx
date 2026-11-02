@@ -61,7 +61,7 @@ export default function OrderBlock({ block, onChange, studentView }: Props) {
                   ref={el => { if (el) autoResize(el); }}
                   placeholder={`${i + 1}단계`}
                   rows={1}
-                  style={{ ...DASHED, flex: 1, resize: 'none', overflow: 'hidden', minHeight: 38, background: aiSteps ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'), ...(focusIdx === i ? DASHED_FOCUS : {}) }}
+                  style={{ ...DASHED, flex: 1, resize: 'none', overflow: 'hidden', minHeight: 38, background: aiSteps ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'), ...(focusIdx === i ? DASHED_FOCUS : {}), ...(aiSteps ? { paddingRight: 38 } : {}) }}
                 />
               </div>
             </AiField>

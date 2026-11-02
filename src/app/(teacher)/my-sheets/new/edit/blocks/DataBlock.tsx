@@ -2,18 +2,26 @@
 
 import { useState } from 'react';
 import type { DataBlock as T } from '../types';
-import { DASHED, DASHED_FOCUS, autoResize, AiField } from './BlockWrapper';
+import { DASHED, DASHED_FOCUS, autoResize, AiField, XBtn } from './BlockWrapper';
 
 interface Props { block: T; onChange: (u: Partial<T>) => void; studentView: boolean; }
 
+const aiBadge: React.CSSProperties = {
+  position: 'absolute', right: 8, top: 8,
+  height: 20, padding: '0 7px', borderRadius: 10,
+  background: '#7048e8', color: '#fff', fontSize: 11, fontWeight: 800,
+  display: 'inline-flex', alignItems: 'center', pointerEvents: 'none',
+};
+
 export default function DataBlock({ block, onChange, studentView }: Props) {
   const [focusKey, setFocusKey] = useState('');
+  const aiCols = block.aiFields?.includes('cols');
   const aiRows = block.aiFields?.includes('rows');
   const aiA    = block.aiFields?.includes('a');
 
   function setCol(i: 0 | 1, v: string) {
     const cols: [string, string] = [...block.cols] as [string, string]; cols[i] = v;
-    onChange({ cols });
+    onChange({ cols, aiFields: block.aiFields?.filter(f => f !== 'cols') });
   }
 
   function setRow(i: number, side: 0 | 1, v: string) {
@@ -69,63 +77,71 @@ export default function DataBlock({ block, onChange, studentView }: Props) {
 
       {/* Table + Answer */}
       <div>
-        <AiField active={aiRows}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                {block.cols.map((c, i) => (
-                  <th key={i} style={{ ...thStyle, padding: 4 }}>
+        <table style={tableStyle}>
+          <thead>
+            <tr>
+              {block.cols.map((c, i) => (
+                <th key={i} style={{ ...thStyle, padding: 4 }}>
+                  <div style={{ position: 'relative' }}>
                     <input value={c} onChange={e => setCol(i as 0 | 1, e.target.value)}
                       placeholder={`열 ${i + 1} 제목`}
-                      style={{ ...DASHED, height: 32, fontSize: 12.5, fontWeight: 700 }}
+                      style={{ ...DASHED, height: 32, fontSize: 12.5, fontWeight: 700, background: aiCols ? '#f3f0ff' : '#fbfcfe', ...(aiCols ? { paddingRight: 38 } : {}) }}
                     />
-                  </th>
-                ))}
-                <th style={{ ...thStyle, width: 28 }} />
-              </tr>
-            </thead>
-            <tbody>
-              {block.rows.map((r, i) => (
-                <tr key={i}>
-                  {r.map((c, j) => (
-                    <td key={j} style={{ ...tdStyle, padding: 4 }}>
+                    {aiCols && <span style={aiBadge}>AI</span>}
+                  </div>
+                </th>
+              ))}
+              <th style={{ ...thStyle, width: 28 }} />
+            </tr>
+          </thead>
+          <tbody>
+            {block.rows.map((r, i) => (
+              <tr key={i}>
+                {r.map((c, j) => (
+                  <td key={j} style={{ ...tdStyle, padding: 4 }}>
+                    <div style={{ position: 'relative' }}>
                       <input value={c} onChange={e => setRow(i, j as 0 | 1, e.target.value)}
                         onFocus={() => setFocusKey(`r${i}c${j}`)} onBlur={() => setFocusKey('')}
                         placeholder={j === 0 ? `항목 ${i + 1}` : `값 ${i + 1}`}
-                        style={{ ...DASHED, height: 34, background: aiRows ? '#f3f0ff' : (focusKey === `r${i}c${j}` ? '#fff' : '#fbfcfe'), ...(focusKey === `r${i}c${j}` ? DASHED_FOCUS : {}) }}
+                        style={{ ...DASHED, height: 34, background: aiRows ? '#f3f0ff' : (focusKey === `r${i}c${j}` ? '#fff' : '#fbfcfe'), ...(focusKey === `r${i}c${j}` ? DASHED_FOCUS : {}), ...(aiRows ? { paddingRight: 38 } : {}) }}
                       />
-                    </td>
-                  ))}
-                  <td style={{ ...tdStyle, padding: 4, textAlign: 'center' }}>
-                    {block.rows.length > 2 && (
-                      <button onClick={() => removeRow(i)} style={{ width: 22, height: 22, border: '1px solid #ffc9c9', borderRadius: 5, background: '#fff5f5', color: '#c92a2a', fontSize: 13, cursor: 'pointer' }}>×</button>
-                    )}
+                      {aiRows && <span style={aiBadge}>AI</span>}
+                    </div>
                   </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </AiField>
-        {block.rows.length < 6 && (
-          <button onClick={addRow} style={{ height: 30, padding: '0 10px', borderRadius: 7, border: '1.5px dashed #c7cedb', background: 'none', fontSize: 12.5, color: '#5d6880', cursor: 'pointer', marginBottom: 10 }}>
-            + 줄 추가 ({block.rows.length}/6)
-          </button>
-        )}
-        {block.noImg && (
-          <button onClick={() => onChange({ noImg: false })} style={{ height: 30, padding: '0 10px', borderRadius: 7, border: '1.5px dashed #c7cedb', background: 'none', fontSize: 12.5, color: '#5d6880', cursor: 'pointer', marginBottom: 8, marginLeft: 8 }}>+ 그래프 넣기</button>
-        )}
-        <AiField active={aiA}>
+                ))}
+                <td style={{ ...tdStyle, padding: 4, textAlign: 'center' }}>
+                  {block.rows.length > 2 && (
+                    <XBtn onClick={() => removeRow(i)} />
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+          {block.rows.length < 6 && (
+            <button onClick={addRow} style={{ height: 30, padding: '0 10px', borderRadius: 7, border: '1.5px dashed #c7cedb', background: 'none', fontSize: 12.5, color: '#5d6880', cursor: 'pointer' }}>
+              + 줄 추가 ({block.rows.length}/6)
+            </button>
+          )}
+          {block.noImg && (
+            <button onClick={() => onChange({ noImg: false })} style={{ height: 30, padding: '0 10px', borderRadius: 7, border: '1.5px dashed #c7cedb', background: 'none', fontSize: 12.5, color: '#5d6880', cursor: 'pointer' }}>+ 그래프 넣기</button>
+          )}
+        </div>
+        <div>
           <label style={{ fontSize: 13, fontWeight: 700, color: '#5d6880', display: 'block', marginBottom: 4 }}>예시 답</label>
-          <textarea
-            value={block.a}
-            onChange={e => { onChange({ a: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'a') }); autoResize(e.target); }}
-            onFocus={() => setFocusKey('ans')} onBlur={() => setFocusKey('')}
-            ref={el => { if (el) autoResize(el); }}
-            placeholder="예시 답안"
-            rows={2}
-            style={{ ...DASHED, resize: 'none', overflow: 'hidden', minHeight: 52, background: aiA ? '#f3f0ff' : (focusKey === 'ans' ? '#fff' : '#fbfcfe'), ...(focusKey === 'ans' ? DASHED_FOCUS : {}) }}
-          />
-        </AiField>
+          <AiField active={aiA}>
+            <textarea
+              value={block.a}
+              onChange={e => { onChange({ a: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'a') }); autoResize(e.target); }}
+              onFocus={() => setFocusKey('ans')} onBlur={() => setFocusKey('')}
+              ref={el => { if (el) autoResize(el); }}
+              placeholder="예시 답안"
+              rows={2}
+              style={{ ...DASHED, resize: 'none', overflow: 'hidden', minHeight: 52, background: aiA ? '#f3f0ff' : (focusKey === 'ans' ? '#fff' : '#fbfcfe'), ...(focusKey === 'ans' ? DASHED_FOCUS : {}), ...(aiA ? { paddingRight: 38 } : {}) }}
+            />
+          </AiField>
+        </div>
       </div>
     </div>
   );

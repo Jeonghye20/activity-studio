@@ -2,9 +2,16 @@
 
 import { useState } from 'react';
 import type { MultiBlock as T } from '../types';
-import { DASHED, DASHED_FOCUS, AiField, XBtn } from './BlockWrapper';
+import { DASHED, DASHED_FOCUS, XBtn } from './BlockWrapper';
 
 interface Props { block: T; onChange: (u: Partial<T>) => void; studentView: boolean; }
+
+const aiBadge: React.CSSProperties = {
+  position: 'absolute', right: 8, top: 8,
+  height: 20, padding: '0 7px', borderRadius: 10,
+  background: '#7048e8', color: '#fff', fontSize: 11, fontWeight: 800,
+  display: 'inline-flex', alignItems: 'center', pointerEvents: 'none',
+};
 
 export default function MultiBlock({ block, onChange, studentView }: Props) {
   const [focusIdx, setFocusIdx] = useState(-1);
@@ -50,31 +57,33 @@ export default function MultiBlock({ block, onChange, studentView }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {block.opts.map((o, i) => {
           const isAns = block.ans.includes(i);
+          const aiActive = aiOpts || (aiAns && isAns);
           return (
-            <AiField key={i} active={aiOpts || (aiAns && isAns)}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <button
-                  onClick={() => toggleAns(i)}
-                  style={{
-                    width: 24, height: 24, borderRadius: 6, cursor: 'pointer', flexShrink: 0,
-                    border: `2px solid ${isAns ? '#2b8a3e' : '#c5ccd8'}`,
-                    background: isAns ? '#ebfbee' : '#fff',
-                    display: 'grid', placeItems: 'center',
-                  }}
-                >
-                  {isAns && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#2b8a3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                </button>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                onClick={() => toggleAns(i)}
+                style={{
+                  width: 24, height: 24, borderRadius: 6, cursor: 'pointer', flexShrink: 0,
+                  border: `2px solid ${isAns ? '#2b8a3e' : '#c5ccd8'}`,
+                  background: isAns ? '#ebfbee' : '#fff',
+                  display: 'grid', placeItems: 'center',
+                }}
+              >
+                {isAns && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#2b8a3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+              </button>
+              <div style={{ flex: 1, position: 'relative' }}>
                 <input
                   value={o}
                   onChange={e => setOpt(i, e.target.value)}
                   onFocus={() => setFocusIdx(i)}
                   onBlur={() => setFocusIdx(-1)}
                   placeholder={`보기 ${i + 1}`}
-                  style={{ ...DASHED, flex: 1, height: 38, background: (aiOpts || (aiAns && isAns)) ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'), ...(focusIdx === i ? DASHED_FOCUS : {}) }}
+                  style={{ ...DASHED, width: '100%', height: 38, background: aiActive ? '#f3f0ff' : (focusIdx === i ? '#fff' : '#fbfcfe'), ...(focusIdx === i ? DASHED_FOCUS : {}), ...(aiActive ? { paddingRight: 38 } : {}) }}
                 />
-                {block.opts.length > 2 && <XBtn onClick={() => removeOpt(i)} />}
+                {aiActive && <span style={aiBadge}>AI</span>}
               </div>
-            </AiField>
+              {block.opts.length > 2 && <XBtn onClick={() => removeOpt(i)} />}
+            </div>
           );
         })}
       </div>

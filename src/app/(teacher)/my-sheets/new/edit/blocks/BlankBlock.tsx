@@ -34,26 +34,30 @@ export default function BlankBlock({ block, onChange, studentView }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <AiField active={aiSent}>
+      <div>
         <label style={{ fontSize: 13, fontWeight: 700, color: '#5d6880', display: 'block', marginBottom: 4 }}>문장 (빈칸 자리는 [ ]로 표시)</label>
-        <input
-          value={block.sent}
-          onChange={e => onChange({ sent: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'sent') })}
-          onFocus={() => setSentFocus(true)} onBlur={() => setSentFocus(false)}
-          placeholder="예: 조건이 [참]이면 if 아래의 명령을 실행한다."
-          style={{ ...DASHED, height: 42, background: aiSent ? '#f3f0ff' : (sentFocus ? '#fff' : '#fbfcfe'), ...(sentFocus ? DASHED_FOCUS : {}) }}
-        />
-      </AiField>
-      <AiField active={aiA}>
+        <AiField active={aiSent}>
+          <input
+            value={block.sent}
+            onChange={e => onChange({ sent: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'sent') })}
+            onFocus={() => setSentFocus(true)} onBlur={() => setSentFocus(false)}
+            placeholder="예: 조건이 [참]이면 if 아래의 명령을 실행한다."
+            style={{ ...DASHED, height: 42, background: aiSent ? '#f3f0ff' : (sentFocus ? '#fff' : '#fbfcfe'), ...(sentFocus ? DASHED_FOCUS : {}), ...(aiSent ? { paddingRight: 38 } : {}) }}
+          />
+        </AiField>
+      </div>
+      <div>
         <label style={{ fontSize: 13, fontWeight: 700, color: '#5d6880', display: 'block', marginBottom: 4 }}>정답</label>
-        <input
-          value={block.a}
-          onChange={e => onChange({ a: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'a') })}
-          onFocus={() => setAnsFocus(true)} onBlur={() => setAnsFocus(false)}
-          placeholder="빈칸에 들어갈 정답"
-          style={{ ...DASHED, height: 42, background: aiA ? '#f3f0ff' : (ansFocus ? '#fff' : '#fbfcfe'), ...(ansFocus ? DASHED_FOCUS : {}) }}
-        />
-      </AiField>
+        <AiField active={aiA}>
+          <input
+            value={block.a}
+            onChange={e => onChange({ a: e.target.value, aiFields: block.aiFields?.filter(f => f !== 'a') })}
+            onFocus={() => setAnsFocus(true)} onBlur={() => setAnsFocus(false)}
+            placeholder="빈칸에 들어갈 정답"
+            style={{ ...DASHED, height: 42, background: aiA ? '#f3f0ff' : (ansFocus ? '#fff' : '#fbfcfe'), ...(ansFocus ? DASHED_FOCUS : {}), ...(aiA ? { paddingRight: 38 } : {}) }}
+          />
+        </AiField>
+      </div>
     </div>
   );
 }

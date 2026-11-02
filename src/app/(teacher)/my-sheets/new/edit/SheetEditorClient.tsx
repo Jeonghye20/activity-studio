@@ -8,7 +8,7 @@ import type {
   Block, BlockType, Sheet,
   ChoiceBlock as ChoiceT, MultiBlock as MultiT, OxBlock as OxT,
 } from './types';
-import { createEmptySheet, createEmptyBlock, AI_FILL_CONCEPT, AI_FILL_FREE_6 } from './demoData';
+import { createEmptySheet, createEmptyBlock, AI_FILL_CONCEPT, AI_FILL_FREE_6, AI_FILL_FREE_7_SORT } from './demoData';
 import { loadCreatedSheet, saveCreatedSheet } from './createdSheetsStore';
 import MaterialCard from './MaterialCard';
 import AddBlockPanel from './AddBlockPanel';
@@ -56,7 +56,7 @@ function computeAiFill(sheet: Sheet, freeCount?: 5 | 6 | 7): {
     if (cnt === 5) aiBlocks = aiBlocks.filter(b => b.type !== 'line');
     else if (cnt === 7) {
       const sortIdx = aiBlocks.findIndex(b => b.type === 'data');
-      aiBlocks.splice(sortIdx, 0, createEmptyBlock('sort'));
+      aiBlocks.splice(sortIdx, 0, AI_FILL_FREE_7_SORT);
     }
     const newBlocks: Block[] = aiBlocks.map((ab, i) => {
       const ex = sheet.blocks[i];
@@ -279,13 +279,20 @@ export default function SheetEditorClient() {
         </div>
       </div>
 
+      {/* ─ 학생 화면 미리보기 안내 바 ─ */}
+      {editorStep === 1 && studentView && (
+        <div style={{ padding: '8px 28px', borderBottom: '1px solid var(--line)', background: '#fff', flexShrink: 0, fontSize: 13, color: 'var(--mute)' }}>
+          {sheet.info.title || '제목 없는 활동지'} · 교사용 미리보기라 제출되지 않아요
+        </div>
+      )}
+
       {/* ─ 본문 ─ */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px 60px' }}>
 
         {editorStep === 1 && (
           <div style={{ maxWidth: 920, margin: '0 auto' }}>
             {/* ─ 빨간 알림 바 ─ */}
-            {showErrors && hasErrors && (
+            {!studentView && showErrors && hasErrors && (
               <div style={{ padding: '12px 16px', border: '1.5px solid #f03e3e', borderRadius: 12, background: '#fff5f5', marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
                 <span style={{ fontSize: 13.5, fontWeight: 700, color: '#c92a2a', flex: 1, minWidth: 200 }}>
                   {emptyCount > 0 && `비어 있는 칸 ${emptyCount}개가 있어요`}
@@ -305,21 +312,27 @@ export default function SheetEditorClient() {
               </div>
             )}
 
-            {/* 자유형 배너 */}
-            {isFree && (
-              <div style={{ padding: '10px 16px', borderRadius: 10, background: '#fff9db', border: '1px solid #ffe066', marginBottom: 16, fontSize: 13.5 }}>
-                <b>자유형 활동지</b>예요. 아래 자료 카드에서 AI로 문항을 한 번에 만들 수 있어요. 또는 '문항 추가'로 직접 만드세요.
+            {/* 유형별 안내 바 */}
+            {!studentView && (isFree ? (
+              <div style={{ padding: '10px 16px', borderRadius: 10, background: '#fff9db', border: '1px solid #ffe066', marginBottom: 16, fontSize: 13.5, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style={{ flexShrink: 0, marginTop: 1 }}><path d="M7.5 1.5a4 4 0 00-2.3 7.2V10h4.6V8.7A4 4 0 007.5 1.5z" stroke="#6b4d00" strokeWidth="1.3" strokeLinejoin="round"/><path d="M5.2 11.5h4.6M5.8 13h3.4" stroke="#6b4d00" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                <span><b>자유형</b> 빈 틀이에요. 바로 아래 <b>문항 추가</b>로 원하는 방식을 넣거나, 자료를 넣으면 AI가 문항을 알아서 구성해요.</span>
               </div>
-            )}
+            ) : (
+              <div style={{ padding: '10px 16px', borderRadius: 10, background: '#fff9db', border: '1px solid #ffe066', marginBottom: 16, fontSize: 13.5, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style={{ flexShrink: 0, marginTop: 1 }}><path d="M7.5 1.5a4 4 0 00-2.3 7.2V10h4.6V8.7A4 4 0 007.5 1.5z" stroke="#6b4d00" strokeWidth="1.3" strokeLinejoin="round"/><path d="M5.2 11.5h4.6M5.8 13h3.4" stroke="#6b4d00" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                <span><b>개념 확인</b> 빈 틀이에요. 회색 글자 자리를 눌러 바로 쓰면 돼요. 가진 자료가 있으면 위에서 <b>한 번에 채울 수</b> 있어요.</span>
+              </div>
+            ))}
 
-            <MaterialCard
+            {!studentView && <MaterialCard
               sheetType={sheet.type}
               onFill={handleAiFill}
               loading={false}
               done={aiFilled}
               filledCount={aiFilledCount}
               onReset={() => { setAiFilled(false); setAiFilledCount(0); }}
-            />
+            />}
 
             <InfoBlock
               info={sheet.info}
@@ -352,15 +365,18 @@ export default function SheetEditorClient() {
                 isLast={i === sheet.blocks.length - 1}
                 studentView={studentView}
                 aiQField={b.aiFields?.includes('q') && !!b.aiMade}
+                aiHintField={b.aiFields?.includes('hint')}
                 errorQ={showErrors && !b.q.trim()}
               >
                 {renderBlockInner(b)}
               </BlockWrapper>
             ))}
 
-            <div data-add-panel="">
-              <AddBlockPanel onAdd={addBlock} />
-            </div>
+            {!studentView && (
+              <div data-add-panel="">
+                <AddBlockPanel onAdd={addBlock} />
+              </div>
+            )}
           </div>
         )}
 
@@ -419,7 +435,10 @@ function InfoBlock({
       <div style={{ border: '1.5px solid var(--line)', borderRadius: 16, background: 'var(--surface)', padding: '20px', marginBottom: 14 }}>
         <p style={{ margin: '0 0 2px', fontSize: 13, color: '#5d6880' }}>{info.unit || '단원 없음'}</p>
         <p style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 800 }}>{info.title || '제목 없음'}</p>
-        <p style={{ margin: 0, fontSize: 14, color: '#5d6880' }}>🎯 {info.goal || '학습목표 없음'}</p>
+        <p style={{ margin: 0, fontSize: 14, color: '#5d6880', display: 'flex', alignItems: 'flex-start', gap: 5 }}>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="6.5" cy="6.5" r="5.5" stroke="#5d6880" strokeWidth="1.3"/><circle cx="6.5" cy="6.5" r="2.8" stroke="#5d6880" strokeWidth="1.2"/><circle cx="6.5" cy="6.5" r="1" fill="#5d6880"/></svg>
+          {info.goal || '학습목표 없음'}
+        </p>
         {studentRow}
       </div>
     );
@@ -435,7 +454,10 @@ function InfoBlock({
         fontSize: 12, fontWeight: 800,
         display: 'inline-flex', alignItems: 'center', gap: 4,
         userSelect: 'none',
-      }}>🔒 기본 정보 · 삭제 불가</span>
+      }}>
+        <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><rect x="0.75" y="4.75" width="8.5" height="6.5" rx="1.25" stroke="currentColor" strokeWidth="1.3"/><path d="M3 4.75V3.25a2 2 0 014 0v1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+        기본 정보 · 삭제 불가
+      </span>
 
       {/* 2열 레이아웃 */}
       <div style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
@@ -522,36 +544,33 @@ function AiCoverSVG({ type }: { type: 'concept' | 'free' }) {
   if (type === 'free') {
     return (
       <svg viewBox="0 0 200 130" width="180" height="117" style={{ display: 'block' }}>
-        <rect x="20" y="20" width="160" height="90" rx="10" fill="none" stroke="#adb5bd" strokeWidth="1.5" strokeDasharray="6 4"/>
-        <line x1="100" y1="35" x2="100" y2="95" stroke="#adb5bd" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
-        <line x1="40" y1="65" x2="160" y2="65" stroke="#adb5bd" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
-        <circle cx="100" cy="65" r="6" fill="#e3e7ef"/>
+        <rect x="8" y="6" width="184" height="118" rx="12" fill="#e7f5ff"/>
+        <path d="M100,20 L148,40 L148,76 Q148,110 100,122 Q52,110 52,76 L52,40 Z" fill="#dbe4ff" stroke="#4263eb" strokeWidth="2.5"/>
+        <rect x="88" y="76" width="24" height="18" rx="4" fill="#ffd43b" stroke="#e67700" strokeWidth="1.5"/>
+        <path d="M92,76 L92,68 Q92,58 100,58 Q108,58 108,68 L108,76" fill="none" stroke="#e67700" strokeWidth="2.2" strokeLinecap="round"/>
+        <text x="100" y="91" textAnchor="middle" fill="#1c3a6b" fontSize="11" fontWeight="bold" fontFamily="monospace" letterSpacing="3">****</text>
       </svg>
     );
   }
+  /* concept → 매표소 */
   return (
     <svg viewBox="0 0 200 130" width="180" height="117" style={{ display: 'block' }}>
-      {/* start oval */}
-      <rect x="68" y="6" width="64" height="22" rx="11" fill="#dbe4ff" stroke="#4263eb" strokeWidth="1.5"/>
-      {/* arrow */}
-      <line x1="100" y1="28" x2="100" y2="44" stroke="#adb5bd" strokeWidth="1.5"/>
-      <polygon points="97,42 103,42 100,48" fill="#adb5bd"/>
-      {/* diamond */}
-      <polygon points="100,48 138,70 100,92 62,70" fill="#fff9db" stroke="#f59f00" strokeWidth="1.5"/>
-      {/* left */}
-      <line x1="62" y1="70" x2="22" y2="70" stroke="#adb5bd" strokeWidth="1.5"/>
-      <line x1="22" y1="70" x2="22" y2="88" stroke="#adb5bd" strokeWidth="1.5"/>
-      <polygon points="19,86 25,86 22,92" fill="#adb5bd"/>
-      <rect x="4" y="92" width="36" height="22" rx="6" fill="#d3f9d8" stroke="#40c057" strokeWidth="1.5"/>
-      <line x1="12" y1="100" x2="32" y2="100" stroke="#40c057" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="12" y1="107" x2="26" y2="107" stroke="#40c057" strokeWidth="1.2" strokeLinecap="round" opacity=".5"/>
-      {/* right */}
-      <line x1="138" y1="70" x2="178" y2="70" stroke="#adb5bd" strokeWidth="1.5"/>
-      <line x1="178" y1="70" x2="178" y2="88" stroke="#adb5bd" strokeWidth="1.5"/>
-      <polygon points="175,86 181,86 178,92" fill="#adb5bd"/>
-      <rect x="160" y="92" width="36" height="22" rx="6" fill="#ffe3e3" stroke="#fa5252" strokeWidth="1.5"/>
-      <line x1="168" y1="100" x2="188" y2="100" stroke="#fa5252" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="168" y1="107" x2="182" y2="107" stroke="#fa5252" strokeWidth="1.2" strokeLinecap="round" opacity=".5"/>
+      {/* 연한 파랑 배경 */}
+      <rect x="8" y="6" width="184" height="118" rx="12" fill="#e7f5ff"/>
+      {/* 건물 몸체 */}
+      <rect x="62" y="50" width="76" height="62" rx="4" fill="#f8f9fa" stroke="#a5d8ff" strokeWidth="1.5"/>
+      {/* 노란 지붕 (사다리꼴) */}
+      <polygon points="50,50 150,50 142,28 58,28" fill="#ffd43b" stroke="#f59f00" strokeWidth="1.5"/>
+      {/* TICKET 표지판 */}
+      <rect x="71" y="55" width="58" height="17" rx="3" fill="#339af0"/>
+      <text x="100" y="67" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="bold" fontFamily="sans-serif" letterSpacing="1.5">TICKET</text>
+      {/* 창구 */}
+      <rect x="77" y="80" width="46" height="24" rx="3" fill="#d0ebff" stroke="#74c0fc" strokeWidth="1.2"/>
+      <line x1="77" y1="92" x2="123" y2="92" stroke="#74c0fc" strokeWidth="1.2"/>
+      {/* 초록 동그라미 (왼쪽) */}
+      <circle cx="36" cy="97" r="13" fill="#40c057" opacity=".85"/>
+      {/* 주황 동그라미 (오른쪽) */}
+      <circle cx="164" cy="97" r="13" fill="#ff922b" opacity=".85"/>
     </svg>
   );
 }

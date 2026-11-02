@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { Sheet } from './types';
 import type { WorksheetType } from '@/types/worksheet';
 import { addMySheet } from '@/app/(teacher)/my-sheets/MySheetsClient';
@@ -13,8 +14,14 @@ interface Props {
 }
 
 export default function SaveStep({ sheet, blockCount, onBack, onSaved }: Props) {
-  function handleSave(share: 'none' | 'all') {
-    const updated: Sheet = { ...sheet, share };
+  const [selectedShare, setSelectedShare] = useState<'none' | 'all'>(sheet.share ?? 'none');
+  const [sourceChecked, setSourceChecked] = useState(false);
+
+  const canSave = selectedShare === 'none' || sourceChecked;
+
+  function handleSave() {
+    if (!canSave) return;
+    const updated: Sheet = { ...sheet, share: selectedShare };
     saveCreatedSheet(updated);
     addMySheet({
       id: sheet.id,
@@ -24,7 +31,7 @@ export default function SaveStep({ sheet, blockCount, onBack, onSaved }: Props) 
       unit: sheet.info.unit || '',
       source: 'create',
       savedAt: new Date().toISOString().slice(0, 10),
-      shared: share === 'all',
+      shared: selectedShare === 'all',
     });
     onSaved();
   }
@@ -43,8 +50,8 @@ export default function SaveStep({ sheet, blockCount, onBack, onSaved }: Props) 
             <button
               key={m}
               className="ocard"
-              aria-pressed={sheet.share === m}
-              onClick={() => handleSave(m)}
+              aria-pressed={selectedShare === m}
+              onClick={() => { setSelectedShare(m); if (m === 'none') setSourceChecked(false); }}
             >
               <b>{m === 'none' ? '공유 안 함' : '전국 공유'}</b>
               <small>{m === 'none' ? '나만 볼 수 있어요.' : '전국 정보 선생님의 홈에 보여요.'}</small>
@@ -52,10 +59,30 @@ export default function SaveStep({ sheet, blockCount, onBack, onSaved }: Props) 
           ))}
         </div>
 
+        {selectedShare === 'all' && (
+          <div style={{ marginTop: 14, padding: '14px 16px', border: '1px solid #e3e7ef', borderRadius: 10, background: '#f8f9fa' }}>
+            <p style={{ margin: '0 0 10px', fontSize: 13, color: '#4a5563' }}>다른 선생님이 볼 수 있어요. 올린 자료의 출처를 확인해 주세요.</p>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={sourceChecked}
+                onChange={e => setSourceChecked(e.target.checked)}
+                style={{ width: 16, height: 16, accentColor: '#1c3a6b', cursor: 'pointer' }}
+              />
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: '#172036' }}>자료 출처를 확인했어요</span>
+            </label>
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--line)' }}>
           <button className="btn ghost" onClick={onBack}>만들기로 돌아가기</button>
-          <button className="btn primary" onClick={() => handleSave(sheet.share)}>
-            내 자료에 저장
+          <button
+            className="btn primary"
+            onClick={handleSave}
+            disabled={!canSave}
+            style={{ opacity: canSave ? 1 : 0.45, cursor: canSave ? 'pointer' : 'not-allowed' }}
+          >
+            저장하기
           </button>
         </div>
       </div>
