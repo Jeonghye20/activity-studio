@@ -6,6 +6,7 @@ import type { WorksheetSummary } from '@/types/worksheet';
 import TypeCover from '@/components/TypeCover';
 import TypeTag from '@/components/TypeTag';
 import { type TypeKey } from '@/lib/types';
+import HomeFilterBar, { type FilterValues } from '@/components/HomeFilterBar';
 
 /* ── 범위 설정 ── */
 const SCOPE_KEY = 'activity_studio_scope';
@@ -221,9 +222,8 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
   const [loading,      setLoading]      = useState(false);
   const [scope,        setScope]        = useState<ScopeConfig>(DEFAULT_SCOPE);
   const [showSetup,    setShowSetup]    = useState(false);
-  const [showScopeDrop,setShowScopeDrop]= useState(false);
+  const [filterKey,    setFilterKey]    = useState(0);
   const inputRef   = useRef<HTMLInputElement>(null);
-  const scopeRef   = useRef<HTMLDivElement>(null);
 
   /* localStorage 로드 */
   useEffect(() => {
@@ -236,16 +236,6 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
     } catch {}
     setShowSetup(true);
   }, []);
-
-  /* 범위 드롭다운 외부 클릭 닫기 */
-  useEffect(() => {
-    if (!showScopeDrop) return;
-    function onDown(e: MouseEvent) {
-      if (scopeRef.current && !scopeRef.current.contains(e.target as Node)) setShowScopeDrop(false);
-    }
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [showScopeDrop]);
 
   /* 검색 */
   function handleSearch(q: string) {
@@ -288,7 +278,11 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
     localStorage.removeItem(SCOPE_KEY);
     setScope(DEFAULT_SCOPE);
     setShowSetup(true);
-    setShowScopeDrop(false);
+    setFilterKey(k => k + 1);
+  }
+
+  function handleFilterChange(values: FilterValues) {
+    setScope(prev => ({ ...prev, school: values.school, subject: values.subject }));
   }
 
   /* 섹션용 데이터 */
@@ -296,8 +290,6 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
   const recent     = RECENT_IDS.map(id => worksheets.find(w => w.id === id)).filter(Boolean) as WorksheetSummary[];
   const specialized= worksheets.filter(w => ['escape','mystery'].includes(w.type)).slice(0, 8);
   const shared     = worksheets.filter(w => w.type === 'concept').slice(0, 4);
-  const scopeLabel = `${scope.school}·${scope.subject}`;
-
   return (
     <>
       {showSetup && <SetupModal onDone={handleSetupDone} />}
@@ -342,39 +334,7 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
             <div className="ask-sep" aria-hidden="true" />
 
             {/* 칩 줄 */}
-            <div className="chips" role="group" aria-label="범위 및 상황 칩">
-              {/* 범위 칩 */}
-              <div ref={scopeRef} style={{ position: 'relative' }}>
-                <button type="button" className="scope" onClick={() => setShowScopeDrop(v => !v)}>
-                  {scopeLabel}
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
-                    <path d="M6 9l6 6 6-6"/>
-                  </svg>
-                </button>
-                {showScopeDrop && (
-                  <div style={{
-                    position: 'absolute', top: 'calc(100% + 8px)', left: 0, zIndex: 120,
-                    background: '#fff', borderRadius: 14, boxShadow: '0 8px 28px rgba(0,0,0,.13)',
-                    padding: '18px 18px 14px', width: 320, border: '1px solid var(--line)',
-                  }}>
-                    <ScopeChips
-                      school={scope.school} subject={scope.subject} size="sm"
-                      onSchool={s => setScope(prev => ({ ...prev, school: s }))}
-                      onSubject={s => setScope(prev => ({ ...prev, subject: s }))}
-                    />
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
-                      <button
-                        type="button" className="link-btn"
-                        onClick={() => { localStorage.setItem(SCOPE_KEY, JSON.stringify({ ...scope, done: true })); }}
-                      >
-                        기본값으로 저장
-                      </button>
-                      <button type="button" className="btn sm" onClick={() => setShowScopeDrop(false)}>완료</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
+            <div className="chips" role="group" aria-label="상황 칩">
               {/* 상황 칩 */}
               {COMMON_CHIPS.map(c => (
                 <button
@@ -409,6 +369,16 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
             <Link href="/my-sheets/new" className="link-btn">활동지 만들기</Link>
           </div>
         </section>
+
+        {/* ── 필터 줄 ── */}
+        <div style={{ marginTop: 18 }}>
+          <HomeFilterBar
+            key={filterKey}
+            initialSchool={scope.school}
+            initialSubject={scope.subject}
+            onChange={handleFilterChange}
+          />
+        </div>
 
         {/* ── 검색 결과 ── */}
         {(loading || searchResult) && (
