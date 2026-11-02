@@ -100,12 +100,10 @@ export default function ClassDashboard() {
   // 피드백 인라인 상태
   const [feedbackExpanded, setFeedbackExpanded] = useState(false);
   const [fbTab, setFbTab] = useState<'watch' | 'all'>('watch');
-  const [feedbacks, setFeedbacks] = useState<Record<string, FeedbackValue>>(
-    Object.fromEntries(WATCH_STUDENTS.map(s => [s.name, s.feedback]))
-  );
-  const [comments, setComments] = useState<Record<string, string>>(
-    Object.fromEntries(WATCH_STUDENTS.map(s => [s.name, s.aiComment]))
-  );
+  const [feedbacks, setFeedbacks] = useState<Record<string, FeedbackValue>>({});
+  const [comments, setComments] = useState<Record<string, string>>({});
+  const [aiDraftLoading, setAiDraftLoading] = useState<Record<string, boolean>>({});
+  const [aiDraftApplied, setAiDraftApplied] = useState<Record<string, boolean>>({});
   const [fbSent, setFbSent] = useState(false);
   const [fbUndoTimer, setFbUndoTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
@@ -142,6 +140,16 @@ export default function ClassDashboard() {
     if (fbUndoTimer) clearTimeout(fbUndoTimer);
     setFbSent(false);
     setFbUndoTimer(null);
+  }
+
+  function handleAiDraft(name: string, suggested: FeedbackValue, comment: string) {
+    setAiDraftLoading(prev => ({ ...prev, [name]: true }));
+    setTimeout(() => {
+      setFeedbacks(f => ({ ...f, [name]: suggested }));
+      setComments(c => ({ ...c, [name]: comment }));
+      setAiDraftApplied(prev => ({ ...prev, [name]: true }));
+      setAiDraftLoading(prev => ({ ...prev, [name]: false }));
+    }, 700);
   }
 
   const filter: AiFilterKey = aiResult?.filter ?? null;
@@ -449,19 +457,50 @@ export default function ClassDashboard() {
                                       background: feedbacks[s.name] === v ? 'var(--navy)' : '#fff',
                                       color: feedbacks[s.name] === v ? '#fff' : 'var(--sub)',
                                       fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                                      position: 'relative',
                                     }}
                                   >
                                     {FEEDBACK_LABELS[v]}
+                                    {aiDraftApplied[s.name] && feedbacks[s.name] === v && (
+                                      <span style={{ position: 'absolute', top: -7, right: -4, fontSize: 8, fontWeight: 800, background: '#7048e8', color: '#fff', borderRadius: 4, padding: '1px 4px', lineHeight: 1.4 }}>AI</span>
+                                    )}
                                   </button>
                                 ))}
                               </div>
-                              <div style={{ fontSize: 12, color: '#dc2626', marginBottom: 6, fontWeight: 600 }}>{s.aiReason}</div>
+                              <div style={{ fontSize: 12, color: '#dc2626', marginBottom: 8, fontWeight: 600 }}>{s.aiReason}</div>
+                              {/* AI 초안 버튼 */}
+                              {!aiDraftApplied[s.name] && (
+                                <button
+                                  onClick={() => handleAiDraft(s.name, s.feedback, s.aiComment)}
+                                  disabled={aiDraftLoading[s.name]}
+                                  style={{
+                                    marginBottom: 8, height: 34, padding: '0 14px', borderRadius: 20,
+                                    border: '1.5px solid #7048e8', background: '#f3f0ff', color: '#7048e8',
+                                    fontSize: 13, fontWeight: 700, cursor: aiDraftLoading[s.name] ? 'default' : 'pointer',
+                                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                                    opacity: aiDraftLoading[s.name] ? 0.7 : 1,
+                                  }}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10.5 14.2 12.7 12 19l-2.2-6.3L3.5 10.5l6.3-2.2z"/></svg>
+                                  {aiDraftLoading[s.name] ? 'AI가 초안 만들고 있어요…' : 'AI 초안 보기'}
+                                </button>
+                              )}
+                              {aiDraftApplied[s.name] && (
+                                <div style={{ fontSize: 11.5, color: '#7048e8', fontWeight: 700, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10.5 14.2 12.7 12 19l-2.2-6.3L3.5 10.5l6.3-2.2z"/></svg>
+                                  AI 초안 · 수정 가능
+                                </div>
+                              )}
                               <input
                                 value={comments[s.name] ?? ''}
                                 onChange={e => setComments(c => ({ ...c, [s.name]: e.target.value }))}
+                                placeholder={aiDraftApplied[s.name] ? '' : '한 마디를 남겨 보세요. AI 초안을 먼저 써 볼 수 있어요.'}
                                 style={{
-                                  width: '100%', height: 40, border: '1px solid var(--line)', borderRadius: 8,
+                                  width: '100%', height: 40,
+                                  border: `1px solid ${aiDraftApplied[s.name] ? '#c4b5fd' : 'var(--line)'}`,
+                                  borderRadius: 8,
                                   padding: '0 12px', fontSize: 13, color: 'var(--ink)', boxSizing: 'border-box',
+                                  background: aiDraftApplied[s.name] ? '#faf7ff' : '#fff',
                                 }}
                               />
                             </div>
