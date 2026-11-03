@@ -285,7 +285,7 @@ function StudentRow({
         >{isAbsent ? '결석' : '출석'}</button>
       </td>
 
-      {/* 성취 변화 — 남는 폭 전부 */}
+      {/* 활동 지수 — 남는 폭 전부 */}
       <td style={{ ...cellCls }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, filter: achieveFilter }}>
           <span style={{
@@ -466,7 +466,7 @@ export default function StudentList({
                 </button>
               </th>
               <th style={{ width: 90, padding: '0 12px', height: 40, textAlign: 'center', fontSize: 12.5, fontWeight: 500, color: 'var(--ink-3)' }}>출결</th>
-              <th style={{ padding: '0 12px', height: 40, textAlign: 'left', fontSize: 12.5, fontWeight: 500, color: 'var(--ink-3)' }}>성취 변화</th>
+              <th style={{ padding: '0 12px', height: 40, textAlign: 'left', fontSize: 12.5, fontWeight: 500, color: 'var(--ink-3)' }}>활동 지수</th>
               <th style={{ width: 160, padding: '0 12px', height: 40, textAlign: 'left', fontSize: 12.5, fontWeight: 500, color: 'var(--ink-3)' }}>활동</th>
               <th style={{ width: 44, padding: 0 }} />
             </tr>

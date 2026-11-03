@@ -183,7 +183,7 @@ export default function HomeFilterBar({
       height: 36, padding: '0 10px', minWidth: minW, borderRadius: 10, boxSizing: 'border-box',
       border: modified
         ? '1.5px solid #ffd43b'
-        : `1.5px solid ${isOpen ? 'var(--ink)' : 'var(--line)'}`,
+        : `1.5px solid ${isOpen ? 'var(--ink)' : '#c1c8d6'}`,
       background: modified ? '#fff9db' : '#fff',
       fontSize: 13.5, fontWeight: 700, color: 'var(--ink)',
       cursor: 'pointer', whiteSpace: 'nowrap',
@@ -204,7 +204,7 @@ export default function HomeFilterBar({
       ref={barRef}
       style={{
         display: 'flex', alignItems: 'center', flexWrap: 'nowrap', gap: 22,
-        background: '#fff', border: '1px solid var(--line)',
+        background: '#fff', border: '1.5px solid #a0a8b8', boxShadow: '0 2px 8px rgba(0,0,0,.10)',
         borderRadius: 16, padding: '12px 18px', boxSizing: 'border-box',
       }}
     >

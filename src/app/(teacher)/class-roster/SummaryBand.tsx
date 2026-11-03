@@ -175,10 +175,10 @@ export default function SummaryBand({
         </div>
       </div>
 
-      {/* ── 성취 변화 ── */}
+      {/* ── 활동 지수 ── */}
       <div style={{ ...sec }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>성취 변화</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>활동 지수</span>
           <span style={{ fontSize: 11, color: 'var(--mute)' }}>최근 3활동 vs 이전 3활동</span>
         </div>
 
