@@ -132,12 +132,15 @@ function NavArrow({ href }: { href: string }) {
 }
 
 /* ── 섹션 헤더 ── */
-function SectionHead({ id, title, sub, href }: { id: string; title: string; sub: string; href: string }) {
+function SectionHead({ id, title, sub, href, icon }: { id: string; title: string; sub: string; href: string; icon?: React.ReactNode }) {
   return (
     <div className="sec-h">
-      <div>
-        <h2 id={id}>{title}</h2>
-        <p>{sub}</p>
+      <div className="sec-h-left">
+        {icon && <div className="sec-icon">{icon}</div>}
+        <div>
+          <h2 id={id}>{title}</h2>
+          <p>{sub}</p>
+        </div>
       </div>
       <Link href={href} style={{ color: 'var(--ink-2)', fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap', textDecoration: 'none' }}>
         전체 보기
@@ -528,6 +531,11 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
             id="sec-recent" title="최근 나온 활동지"
             sub="새로 올라온 활동지부터 보여 드려요."
             href="/browse?from=recent"
+            icon={
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: 'linear-gradient(135deg,#fef3c7,#fde68a)', display: 'grid', placeItems: 'center' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            }
           />
           <div className="sec-cards-row">
             <div className="ws-grid4">
@@ -546,6 +554,11 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
             title={isInfoScope(scope) ? '정보 특화 활동지' : `${scope.subject} 특화 활동지`}
             sub={isInfoScope(scope) ? '정보 수업에서 자주 쓰는 게임형 활동이에요.' : '이 과목 활동지는 준비 중이에요.'}
             href="/browse?from=spec"
+            icon={
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: 'linear-gradient(135deg,#ede9fe,#ddd6fe)', display: 'grid', placeItems: 'center' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            }
           />
           {isInfoScope(scope) ? (
             <div className="sec-cards-row">
@@ -569,6 +582,11 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
             id="sec-shared" title="선생님들이 공유한 활동"
             sub="전국 정보 선생님들이 자기 수업에 맞게 고쳐 쓴 활동이에요."
             href="/browse?from=shared"
+            icon={
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: 'linear-gradient(135deg,#ffe4e6,#fecdd3)', display: 'grid', placeItems: 'center' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#be123c" strokeWidth="2.2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
+            }
           />
           <div className="sec-cards-row">
             <div className="ws-grid4">

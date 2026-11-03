@@ -541,6 +541,8 @@ a { color: inherit; }
 .sec-box { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 22px 24px; box-shadow: 0 2px 16px rgba(0,0,0,.05); }
 .sec-cards-row { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 14px; }
 .sec-cards-row > .ws-grid4 { flex: 1 1 0; min-width: 0; }
+.sec-h-left { display: flex; align-items: center; gap: 12px; }
+.sec-h-left > div:last-child h2 { margin: 0; }
 .sec-nav-btn { flex: 0 0 40px; align-self: center; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; display: grid; place-items: center; color: var(--ink-2); text-decoration: none; }
 .sec-nav-btn:hover { border-color: var(--ink-2); box-shadow: 0 2px 8px rgba(23,32,54,.1); }
 
