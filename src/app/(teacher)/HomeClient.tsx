@@ -215,6 +215,95 @@ function RCard({ sheet, unitTitle, why }: { sheet: WorksheetSummary; unitTitle?:
   );
 }
 
+/* ── 히어로 일러스트 ── */
+function HeroIllustration() {
+  return (
+    <svg viewBox="0 0 280 210" width="280" height="210" aria-hidden="true" style={{ overflow: 'visible' }}>
+      <defs>
+        <filter id="hi-glow">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="hi-s1"><feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#000" floodOpacity=".38"/></filter>
+        <filter id="hi-s2"><feDropShadow dx="0" dy="5" stdDeviation="9" floodColor="#000" floodOpacity=".28"/></filter>
+        <filter id="hi-s3"><feDropShadow dx="0" dy="10" stdDeviation="14" floodColor="#000" floodOpacity=".5"/></filter>
+        <linearGradient id="hi-ge" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#d97706"/>
+        </linearGradient>
+        <linearGradient id="hi-gc" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3b82f6"/><stop offset="100%" stopColor="#2563eb"/>
+        </linearGradient>
+        <linearGradient id="hi-gm" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#8b5cf6"/><stop offset="100%" stopColor="#6d28d9"/>
+        </linearGradient>
+      </defs>
+
+      <ellipse cx="148" cy="115" rx="95" ry="75" fill="rgba(99,102,241,.1)" filter="url(#hi-glow)"/>
+
+      {/* 뒤 카드 — 탈출 게임 */}
+      <g transform="translate(75,15) rotate(-11)" filter="url(#hi-s2)">
+        <rect width="148" height="102" rx="16" fill="#1c1c2e"/>
+        <rect width="148" height="50" rx="16" fill="url(#hi-ge)"/>
+        <rect y="35" width="148" height="15" fill="url(#hi-ge)"/>
+        <rect x="56" y="6" width="36" height="27" rx="18" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="3.5"/>
+        <rect x="49" y="20" width="50" height="26" rx="7" fill="rgba(0,0,0,.3)"/>
+        <circle cx="74" cy="31" r="6.5" fill="#fff" opacity=".9"/>
+        <rect x="71" y="31" width="6" height="10" rx="3" fill="#d97706"/>
+        <rect x="13" y="58" width="80" height="8" rx="4" fill="rgba(255,255,255,.2)"/>
+        <rect x="13" y="72" width="58" height="6" rx="3" fill="rgba(255,255,255,.12)"/>
+        <rect x="13" y="83" width="50" height="13" rx="6.5" fill="rgba(255,255,255,.1)"/>
+      </g>
+
+      {/* 중간 카드 — 개념 확인 */}
+      <g transform="translate(6,58) rotate(-6)" filter="url(#hi-s1)">
+        <rect width="160" height="108" rx="16" fill="#fff"/>
+        <rect width="160" height="54" rx="16" fill="url(#hi-gc)"/>
+        <rect y="38" width="160" height="16" fill="url(#hi-gc)"/>
+        <rect x="58" y="7" width="22" height="32" rx="4" fill="rgba(255,255,255,.4)"/>
+        <rect x="80" y="7" width="22" height="32" rx="4" fill="rgba(255,255,255,.28)"/>
+        <line x1="80" y1="7" x2="80" y2="39" stroke="rgba(255,255,255,.55)" strokeWidth="2"/>
+        <path d="M90 7v16l6-4 6 4V7z" fill="rgba(255,255,255,.5)"/>
+        <circle cx="120" cy="30" r="13" fill="rgba(255,255,255,.25)" stroke="rgba(255,255,255,.5)" strokeWidth="1.5"/>
+        <path d="M115 30l3.5 3.5 6.5-7" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        <rect x="13" y="62" width="90" height="8" rx="4" fill="#e2e8f0"/>
+        <rect x="13" y="76" width="66" height="6" rx="3" fill="#f1f5f9"/>
+        <rect x="13" y="87" width="56" height="16" rx="8" fill="#dbeafe"/>
+        <rect x="20" y="92" width="42" height="5" rx="2.5" fill="#93c5fd"/>
+      </g>
+
+      {/* 앞 카드 — 추리 게임 */}
+      <g transform="translate(118,76) rotate(7)" filter="url(#hi-s3)">
+        <rect width="150" height="108" rx="16" fill="#fff"/>
+        <rect width="150" height="54" rx="16" fill="url(#hi-gm)"/>
+        <rect y="38" width="150" height="16" fill="url(#hi-gm)"/>
+        <circle cx="65" cy="24" r="16" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="3"/>
+        <circle cx="65" cy="24" r="9" fill="rgba(255,255,255,.2)"/>
+        <path d="M77 36l12 12" stroke="rgba(255,255,255,.7)" strokeWidth="4" strokeLinecap="round"/>
+        <text x="59" y="30" fontSize="13" fill="rgba(255,255,255,.95)" fontWeight="900" fontFamily="sans-serif">?</text>
+        <rect x="13" y="62" width="82" height="8" rx="4" fill="#ede9fe"/>
+        <rect x="13" y="76" width="60" height="6" rx="3" fill="#f5f3ff"/>
+        <rect x="13" y="87" width="56" height="16" rx="8" fill="#ede9fe"/>
+        <rect x="20" y="92" width="42" height="5" rx="2.5" fill="#c4b5fd"/>
+      </g>
+
+      {/* AI 배지 */}
+      <g transform="translate(210,8)" filter="url(#hi-s2)">
+        <rect width="64" height="34" rx="17" fill="#fbbf24"/>
+        <text x="12" y="23" fontSize="15" fontWeight="900" fill="#451a03" fontFamily="sans-serif" letterSpacing="-.5">AI</text>
+        <circle cx="47" cy="17" r="8" fill="rgba(69,26,3,.12)"/>
+        <path d="M43 17l3 3 5-5" stroke="#451a03" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+      </g>
+
+      {/* 반짝이 */}
+      <circle cx="22" cy="30" r="3.5" fill="rgba(251,191,36,.5)" filter="url(#hi-glow)"/>
+      <circle cx="255" cy="60" r="3" fill="rgba(167,139,250,.55)" filter="url(#hi-glow)"/>
+      <circle cx="268" cy="165" r="4" fill="rgba(99,102,241,.45)" filter="url(#hi-glow)"/>
+      <path d="M248 28l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="rgba(255,255,255,.35)" filter="url(#hi-glow)"/>
+      <path d="M35 190l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z" fill="rgba(251,191,36,.4)" filter="url(#hi-glow)"/>
+    </svg>
+  );
+}
+
 /* ── 메인 컴포넌트 ── */
 export default function HomeClient({ worksheets, unitMap }: Props) {
   const [query,        setQuery]        = useState('');
@@ -303,8 +392,9 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
         </div>
 
         {/* ── 히어로 ── */}
-        <section className="hero" aria-labelledby="hero-h1">
-          <h1 id="hero-h1">이번 수업, 어떤 활동이 필요하세요?</h1>
+        <section className="hero hero-grid" aria-labelledby="hero-h1">
+          <div>
+          <h1 id="hero-h1" className="hero-h1-grad">이번 수업, 어떤 활동이<br/>필요하세요?</h1>
 
           {/* 검색 박스 + 칩: 흰색 박스 */}
           <div className="ask">
@@ -367,6 +457,10 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
           <div className="hero-foot" style={{ marginTop: 20 }}>
             찾는 활동이 없나요?{' '}
             <Link href="/my-sheets/new" className="link-btn">활동지 만들기</Link>
+          </div>
+          </div>
+          <div className="hero-art">
+            <HeroIllustration />
           </div>
         </section>
 
