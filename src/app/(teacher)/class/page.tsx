@@ -1021,26 +1021,14 @@ export default function ClassDashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {studentRows.map((rec, i) => {
                   const ss = STUDENT_STATUS_STYLE[rec.status];
-                  const avatarColor = STUDENT_AVATAR_COLORS[rec.name] ?? '#4263eb';
                   return (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0' }}>
-                      <div style={{ position: 'relative', flexShrink: 0 }}>
-                        <div style={{
-                          width: 32, height: 32, borderRadius: '50%',
-                          background: avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 13, fontWeight: 700, color: '#fff',
-                        }}>
-                          {rec.name.slice(0, 1)}
-                        </div>
-                        <span style={{
-                          position: 'absolute', bottom: -2, right: -4,
-                          fontSize: 10, fontWeight: 700, color: 'var(--ink-3)',
-                          background: '#fff', lineHeight: 1,
-                        }}>{rec.num}</span>
-                      </div>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0' }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--ink)' }}>{rec.name}</span>
-                        <span style={{ fontSize: 12, color: 'var(--ink-3)', marginLeft: 8 }}>{rec.desc}</span>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-3)', flexShrink: 0 }}>{rec.num}</span>
+                          <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--ink)' }}>{rec.name}</span>
+                        </div>
+                        <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--ink-3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{rec.desc}</p>
                       </div>
                       <span style={{
                         padding: '3px 9px', borderRadius: 8, fontSize: 12, fontWeight: 700,
@@ -1066,7 +1054,7 @@ export default function ClassDashboard() {
                   놀이공원 입장료 예측표 · 24명 중 4명 표시
                 </p>
                 <Link href="/class-roster" style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>
-                  학생 전체 기록은 학급 관리에서
+                  학생 전체 기록은 학급 관리에서 →
                 </Link>
               </div>
             </div>
