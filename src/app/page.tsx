@@ -1,15 +1,8 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { TypeIconPaths } from '@/components/TypeCover';
 import { ORDER, TYPES } from '@/lib/types';
 
 export default function LandingPage() {
-  const [studentDisabled, setStudentDisabled] = useState(false);
-  useEffect(() => {
-    setStudentDisabled(window.location.hostname !== 'localhost');
-  }, []);
 
   return (
     <div
@@ -111,7 +104,6 @@ export default function LandingPage() {
             title="학생"
             desc=""
             href="/s"
-            disabled={studentDisabled}
           />
         </div>
 
