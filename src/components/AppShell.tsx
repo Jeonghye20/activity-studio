@@ -40,6 +40,12 @@ const IconChart = () => (
     <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>
   </svg>
 );
+const IconSearch = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="7"/>
+    <path d="M20 20l-4-4"/>
+  </svg>
+);
 const IconPeople = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
     <circle cx="9" cy="7" r="4"/>
@@ -59,6 +65,8 @@ function getActiveSection(pathname: string): string {
   if (pathname.startsWith('/my-sheets'))    return '/my-sheets';
   if (pathname.startsWith('/class-roster')) return '/class-roster';
   if (pathname.startsWith('/class'))        return '/class';
+  if (pathname.startsWith('/browse'))       return '/browse';
+  if (/^\/worksheets\/[^/]+$/.test(pathname)) return '/browse';
   return '/home';
 }
 
@@ -87,6 +95,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <NavBtn
             href="/home" label="홈" icon={<IconHome />}
             active={active === '/home'}
+          />
+          <NavBtn
+            href="/browse" label="활동지 찾기" icon={<IconSearch />}
+            active={active === '/browse'}
           />
           <NavBtn
             href="/my-sheets" label="자료실" icon={<IconFolder />}

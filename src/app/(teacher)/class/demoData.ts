@@ -1,8 +1,8 @@
 /* 수업 관리 시연용 고정 데이터 — 값을 바꾸면 관련 화면에 자동 반영 */
 
 export const DEMO_SESSION = {
-  worksheetId: 'ws-logic',
-  worksheetTitle: '놀이공원 입장료 예측표',
+  worksheetId: 'ws-physical',
+  worksheetTitle: '센서가 알아채고, 장치가 움직인다',
   classLabel: '2학년 3반',
   classCode: 'T7Y75',
   total: 24,

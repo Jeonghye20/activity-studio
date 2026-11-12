@@ -6180,6 +6180,13 @@
         "title": "단서 모으기",
         "blocks": [
           {
+            "id": "game",
+            "kind": "bitvault",
+            "method": "추리 게임",
+            "prompt": "증거를 모으고 확인해서, 범인이 민서의 비밀번호를 알아낸 방법을 밝혀 보세요.",
+            "src": "/activities/mystery/case-privacy.html"
+          },
+          {
             "id": "c1",
             "kind": "hotspot",
             "method": "그림에서 찾기",

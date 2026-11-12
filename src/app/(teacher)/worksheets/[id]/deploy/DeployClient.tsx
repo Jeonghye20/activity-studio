@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { WorksheetSummary } from '@/types/worksheet';
+import type { WorksheetSummary, WorksheetType } from '@/types/worksheet';
 import TypeCover from '@/components/TypeCover';
 import TypeTag  from '@/components/TypeTag';
 import type { TypeKey } from '@/lib/types';
+import { addDeployLogs } from '@/lib/deployLogDemo';
 
 /* 시연용 QR */
 function QRPlaceholder() {
@@ -302,7 +303,24 @@ export default function DeployClient({ sheet }: Props) {
               <button
                 className="btn primary"
                 disabled={classes.size === 0 || methods.size === 0}
-                onClick={() => setMode('done')}
+                onClick={() => {
+                  const today = new Date().toISOString().slice(0, 10);
+                  addDeployLogs(
+                    [...classes].map((c, i) => ({
+                      id: `real-${Date.now()}-${i}`,
+                      worksheetId: sheet.id,
+                      worksheetTitle: sheet.title,
+                      worksheetType: sheet.type as WorksheetType,
+                      cls: `2학년 ${c}`,
+                      deployedDate: today,
+                      period: '',
+                      submitted: 0,
+                      total: 24,
+                      status: 'live' as const,
+                    }))
+                  );
+                  setMode('done');
+                }}
               >
                 {classes.size > 0 ? `${classSummary}에 배포하기` : '배포하기'}
               </button>

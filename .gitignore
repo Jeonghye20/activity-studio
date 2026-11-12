@@ -39,15 +39,30 @@ yarn-error.log*
 # Claude Code
 .claude_studio/
 
-# Screenshot scripts
+# Screenshot scripts & capture utilities
 ss.cjs
 ss_scope.cjs
 ss_v27_full.cjs
 ss_v27_survey.cjs
+/take-shots*.js
+/take-filter*.js
 
-# Reference screens (large binary files)
+# Screenshot outputs (root-level)
+/cap-*.png
+/cmp-*.png
+/screenshot*.png
+/shot-*.png
+/verify-*.png
+/record-page.png
+/home-page.png
+/home-mockup.html
+/mystery-game.zip
+/screenshots*/
+
+# Reference materials (large files, not needed in repo)
 screens/
 screens.zip
+/reference/student_mockup/
 
 # typescript
 *.tsbuildinfo

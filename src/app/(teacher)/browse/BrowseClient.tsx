@@ -1,13 +1,26 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { WorksheetSummary, WorksheetType } from '@/types/worksheet';
 import WorksheetCard from '@/components/WorksheetCard';
 import FilterChip from '@/components/FilterChip';
 import { TYPES, ORDER, type TypeKey } from '@/lib/types';
+import { RECENT_IDS, SPEC_IDS } from '@/lib/homeLists';
 
 const ALL_TYPES = ORDER as WorksheetType[];
+
+const FROM_LABEL: Record<string, string> = {
+  recent: '최근 나온 활동지',
+  spec:   '정보 특화 활동지',
+  shared: '선생님들이 공유한 활동',
+};
+const FROM_TITLE: Record<string, string> = {
+  recent: '최근 나온 활동지 전체',
+  spec:   '정보 특화 활동지 전체',
+  shared: '선생님들이 공유한 활동 전체',
+};
 
 interface Props {
   worksheets: WorksheetSummary[];
@@ -15,11 +28,36 @@ interface Props {
 }
 
 export default function BrowseClient({ worksheets, unitMap }: Props) {
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from') ?? '';
+
   const [typeFilter, setTypeFilter] = useState<WorksheetType | null>(null);
   const [search,     setSearch]     = useState('');
 
+  const baseList = useMemo(() => {
+    if (from === 'recent') {
+      return (RECENT_IDS as readonly string[])
+        .map(id => worksheets.find(w => w.id === id))
+        .filter(Boolean) as WorksheetSummary[];
+    }
+    if (from === 'spec') {
+      const specSet = new Set(SPEC_IDS as readonly string[]);
+      const pinned = (SPEC_IDS as readonly string[])
+        .map(id => worksheets.find(w => w.id === id))
+        .filter(Boolean) as WorksheetSummary[];
+      const rest = worksheets.filter(
+        w => (w.type === 'escape' || w.type === 'mystery') && !specSet.has(w.id)
+      );
+      return [...pinned, ...rest];
+    }
+    if (from === 'shared') {
+      return worksheets.filter(w => w.type === 'concept');
+    }
+    return worksheets;
+  }, [worksheets, from]);
+
   const filtered = useMemo(() => {
-    let list = worksheets;
+    let list = baseList;
     if (typeFilter) list = list.filter(w => w.type === typeFilter);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -29,7 +67,9 @@ export default function BrowseClient({ worksheets, unitMap }: Props) {
       );
     }
     return list;
-  }, [worksheets, typeFilter, search, unitMap]);
+  }, [baseList, typeFilter, search, unitMap]);
+
+  const sectionTitle = from ? (FROM_TITLE[from] ?? null) : null;
 
   return (
     <div className="p-main">
@@ -37,13 +77,13 @@ export default function BrowseClient({ worksheets, unitMap }: Props) {
       <nav className="crumb" aria-label="breadcrumb">
         <Link href="/home">홈</Link>
         <span aria-hidden="true">›</span>
-        <span>활동지 목록</span>
+        <span>활동지 찾기</span>
       </nav>
 
       {/* 헤더 */}
       <div className="page-head">
         <div>
-          <h1>활동지 목록</h1>
+          <h1>활동지 찾기</h1>
           <p>단원별로 활동지를 고르고, 카드를 눌러 내용을 확인하세요.</p>
         </div>
         <Link href="/my-sheets/new" className="btn primary" style={{ textDecoration: 'none' }}>
@@ -90,6 +130,28 @@ export default function BrowseClient({ worksheets, unitMap }: Props) {
           </label>
         </div>
       </div>
+
+      {/* 섹션 제목 (from 파라미터) */}
+      {sectionTitle && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'var(--ink)' }}>{sectionTitle}</h2>
+          <Link
+            href="/browse"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              height: 28, padding: '0 10px 0 12px', borderRadius: 20,
+              border: '1.5px solid var(--line)', background: '#fff',
+              fontSize: 13, fontWeight: 600, color: 'var(--ink-2)',
+              textDecoration: 'none', whiteSpace: 'nowrap',
+            }}
+          >
+            {FROM_LABEL[from]}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </Link>
+        </div>
+      )}
 
       {/* 결과 헤더 */}
       <div className="result-h">

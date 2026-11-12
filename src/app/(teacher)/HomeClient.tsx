@@ -7,6 +7,7 @@ import TypeCover from '@/components/TypeCover';
 import TypeTag from '@/components/TypeTag';
 import { type TypeKey } from '@/lib/types';
 import HomeFilterBar, { type FilterValues } from '@/components/HomeFilterBar';
+import { RECENT_IDS, SPEC_IDS } from '@/lib/homeLists';
 
 /* ── 범위 설정 ── */
 const SCOPE_KEY = 'activity_studio_scope';
@@ -150,7 +151,7 @@ function SectionHead({ id, title, sub, href, icon }: { id: string; title: string
 }
 
 /* ── 활동지 카드 ── */
-const EXCLUDE_IDS = ['ws-physical', 'ws-vault', 'ws-cs-escape', 'ws-robot'];
+const EXCLUDE_IDS = ['ws-physical', 'ws-vault', 'ws-cs-escape', 'ws-robot', 'ws-privacy'];
 
 function WsCard({ sheet, unitTitle, isNew, isPreparing }: { sheet: WorksheetSummary; unitTitle?: string; isNew?: boolean; isPreparing?: boolean }) {
   return (
@@ -378,9 +379,8 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
   }
 
   /* 섹션용 데이터 */
-  const RECENT_IDS = ['ws-physical', 'ws-vault', 'ws-cs-escape', 'ws-robot'];
-  const recent     = RECENT_IDS.map(id => worksheets.find(w => w.id === id)).filter(Boolean) as WorksheetSummary[];
-  const specialized= worksheets.filter(w => ['escape','mystery'].includes(w.type)).slice(0, 8);
+  const recent     = (RECENT_IDS as readonly string[]).map(id => worksheets.find(w => w.id === id)).filter(Boolean).slice(0, 4) as WorksheetSummary[];
+  const specialized= (SPEC_IDS as readonly string[]).map(id => worksheets.find(w => w.id === id)).filter(Boolean).slice(0, 4) as WorksheetSummary[];
   const shared     = worksheets.filter(w => w.type === 'concept').slice(0, 4);
   return (
     <>
@@ -514,7 +514,7 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
                       <div className="res-more">
                         나머지 활동도 있어요.{' '}
                         <Link href={`/browse?q=${encodeURIComponent(query)}`} style={{ color: 'var(--ink-2)', fontWeight: 700 }}>
-                          활동지 목록에서 더 보기
+                          활동지 찾기에서 더 보기
                         </Link>
                       </div>
                     )}
@@ -537,13 +537,10 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
               </div>
             }
           />
-          <div className="sec-cards-row">
-            <div className="ws-grid4">
-              {recent.slice(0, 4).map((w, i) => (
-                <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} isNew={true} />
-              ))}
-            </div>
-            <NavArrow href="/browse?from=recent" />
+          <div className="ws-grid4">
+            {recent.slice(0, 4).map((w, i) => (
+              <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} isNew={true} />
+            ))}
           </div>
         </section>
 
@@ -561,13 +558,10 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
             }
           />
           {isInfoScope(scope) ? (
-            <div className="sec-cards-row">
-              <div className="ws-grid4">
-                {specialized.slice(0, 4).map(w => (
-                  <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} isPreparing={!EXCLUDE_IDS.includes(w.id)} />
-                ))}
-              </div>
-              <NavArrow href="/browse?from=spec" />
+            <div className="ws-grid4">
+              {specialized.map(w => (
+                <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} isPreparing={!EXCLUDE_IDS.includes(w.id)} />
+              ))}
             </div>
           ) : (
             <div style={{ padding: '40px 24px', textAlign: 'center', background: 'var(--surface)', borderRadius: 14, border: '1px dashed var(--line)', fontSize: 14, color: 'var(--ink-3)' }}>
@@ -588,13 +582,10 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
               </div>
             }
           />
-          <div className="sec-cards-row">
-            <div className="ws-grid4">
-              {shared.slice(0, 4).map(w => (
-                <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} isPreparing={!EXCLUDE_IDS.includes(w.id)} />
-              ))}
-            </div>
-            <NavArrow href="/browse?from=shared" />
+          <div className="ws-grid4">
+            {shared.slice(0, 4).map(w => (
+              <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} isPreparing={!EXCLUDE_IDS.includes(w.id)} />
+            ))}
           </div>
         </section>
       </div>

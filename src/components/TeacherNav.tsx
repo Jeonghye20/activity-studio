@@ -8,6 +8,8 @@ function getActiveSection(pathname: string): string {
   if (pathname.startsWith('/my-sheets')) return '/my-sheets';
   if (pathname.startsWith('/class')) return '/class';
   if (pathname === '/student-preview') return '/student-preview';
+  if (pathname.startsWith('/browse')) return '/browse';
+  if (/^\/worksheets\/[^/]+$/.test(pathname)) return '/browse';
   return '/home';
 }
 
@@ -22,6 +24,13 @@ const IconHome = () => (
 const IconFolder = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
     <path d="M3 7a2 2 0 012-2h4.17a2 2 0 011.42.59L12 7h7a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+  </svg>
+);
+
+const IconSearch = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="7"/>
+    <path d="M20 20l-4-4"/>
   </svg>
 );
 
@@ -81,9 +90,10 @@ export default function TeacherNav() {
 
       {/* ── 주 메뉴 ── */}
       <div style={{ flex: 1, padding: '4px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <NavItem href="/home"      label="홈"       icon={<IconHome />}   active={activeSection === '/home'} />
-        <NavItem href="/my-sheets" label="내 자료"  icon={<IconFolder />} active={activeSection === '/my-sheets'} />
-        <NavItem href="/class"     label="수업 관리" icon={<IconChart />}  active={activeSection === '/class'} badge={3} />
+        <NavItem href="/home"      label="홈"          icon={<IconHome />}   active={activeSection === '/home'} />
+        <NavItem href="/browse"    label="활동지 찾기" icon={<IconSearch />} active={activeSection === '/browse'} />
+        <NavItem href="/my-sheets" label="내 자료"     icon={<IconFolder />} active={activeSection === '/my-sheets'} />
+        <NavItem href="/class"     label="수업 관리"   icon={<IconChart />}  active={activeSection === '/class'} badge={3} />
       </div>
 
       {/* ── 하단 영역 ── */}

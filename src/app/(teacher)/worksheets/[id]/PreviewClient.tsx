@@ -56,7 +56,7 @@ export default function PreviewClient({ sheet, units }: Props) {
 
       {/* 위치 표시 */}
       <nav className="crumb" aria-label="breadcrumb">
-        <Link href="/browse">활동지 목록</Link>
+        <Link href="/browse">활동지 찾기</Link>
         <span aria-hidden="true">›</span>
         <span>{sheet.title}</span>
       </nav>
