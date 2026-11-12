@@ -21,12 +21,12 @@ const CASE = {
     "post.ramen": "assets/post-ramen.jpg",
     "clue.cond": "assets/clue-cond.png", "clue.order": "assets/clue-order.png", "clue.result": "assets/clue-result.png", "clue.fixed": "assets/clue-fixed.png",
     "clue.check": "assets/clue-check.png", "clue.egg": "assets/clue-egg.png", "clue.bag": "assets/clue-bag.png",
-    "bg.desk": "", "bg.board": ""
+    "bg.club": "assets/bg-club.jpg", "bg.desk": "", "bg.board": ""
   },
   assetLabels: {
     "det.default": "[탐정] 기본", "det.think": "[탐정] 생각", "det.serious": "[탐정] 진지", "det.wow": "[탐정] 놀람", "det.point": "[탐정] 가리킴", "det.praise": "[탐정] 칭찬",
     "inv.default": "[조수] 기본", "inv.surprise": "[조수] 놀람", "inv.found": "[조수] 발견", "inv.proud": "[조수] 자신감",
-    "prop.card": "[소품] 명령 카드 태블릿", "prop.robot": "[소품] 요리 로봇 보글봇", "prop.pot": "[소품] 라면 냄비",
+    "bg.club": "[배경] 요리 동아리실", "prop.card": "[소품] 명령 카드 태블릿", "prop.robot": "[소품] 요리 로봇 보글봇", "prop.pot": "[소품] 라면 냄비",
     "post.ramen": "[소품] 이상한 라면 사진",
     "clue.cond": "[단서] 거꾸로 된 조건", "clue.order": "[단서] 너무 빨리 끈 인덕션", "clue.result": "[단서] 퍼지고 딱딱한 면",
     "clue.fixed": "[단서] 제대로 된 라면", "clue.check": "[단서] 점검표", "clue.egg": "[단서] 삶은 달걀", "clue.bag": "[단서] 라면 봉지"
@@ -38,9 +38,9 @@ const CASE = {
   opening: {
     startLabel: "사건 시작하기",
     panels: [
-      { kind: "notify", caption: "오늘 점심, 별숲중 요리 동아리실", img: "prop.robot",
+      { kind: "notify", caption: "오늘 점심, 별숲중 요리 동아리실", img: "prop.robot", bg: "bg.club",
         app: "보글봇", time: "방금", head: "라면 완성!", body: "받은 명령을 모두 실행했어요." },
-      { kind: "duo", caption: "요리 동아리의 도움 요청",
+      { kind: "duo", caption: "요리 동아리의 도움 요청", bg: "bg.club",
         lines: [
           { who: "det", face: "serious", say: "로봇이 끓인 라면이 이상해." },
           { who: "inv", face: "surprise", say: "면이 퍼졌는데 속은 딱딱해요!" }
