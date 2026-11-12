@@ -17,10 +17,10 @@ const CASE = {
     "inv.surprise": "assets/inv-surprise.png",
     "inv.found": "assets/inv-found.png",
     "inv.proud": "assets/inv-proud.png",
-    "prop.card": "", "prop.robot": "", "prop.pot": "",
-    "post.ramen": "",
-    "clue.cond": "", "clue.order": "", "clue.result": "", "clue.fixed": "",
-    "clue.check": "", "clue.egg": "", "clue.bag": "",
+    "prop.card": "", "prop.robot": "assets/prop-robot.png", "prop.pot": "assets/prop-pot.png",
+    "post.ramen": "assets/post-ramen.jpg",
+    "clue.cond": "assets/clue-cond.png", "clue.order": "assets/clue-order.png", "clue.result": "assets/clue-result.png", "clue.fixed": "assets/clue-fixed.png",
+    "clue.check": "", "clue.egg": "assets/clue-egg.png", "clue.bag": "assets/clue-bag.png",
     "bg.desk": "", "bg.board": ""
   },
   assetLabels: {
