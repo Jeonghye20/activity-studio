@@ -17,7 +17,7 @@ const CASE = {
     "inv.surprise": "assets/inv-surprise.png",
     "inv.found": "assets/inv-found.png",
     "inv.proud": "assets/inv-proud.png",
-    "prop.card": "assets/prop-card.png", "prop.robot": "assets/prop-robot.png", "prop.pot": "assets/prop-pot.png",
+    "prop.ramenpot": "", "prop.card": "assets/prop-card.png", "prop.robot": "assets/prop-robot.png", "prop.pot": "assets/prop-pot.png",
     "post.ramen": "assets/post-ramen.jpg",
     "clue.cond": "assets/clue-cond.png", "clue.order": "assets/clue-order.png", "clue.result": "assets/clue-result.png", "clue.fixed": "assets/clue-fixed.png",
     "clue.check": "assets/clue-check.png", "clue.egg": "assets/clue-egg.png", "clue.bag": "assets/clue-bag.png",
@@ -26,7 +26,7 @@ const CASE = {
   assetLabels: {
     "det.default": "[탐정] 기본", "det.think": "[탐정] 생각", "det.serious": "[탐정] 진지", "det.wow": "[탐정] 놀람", "det.point": "[탐정] 가리킴", "det.praise": "[탐정] 칭찬",
     "inv.default": "[조수] 기본", "inv.surprise": "[조수] 놀람", "inv.found": "[조수] 발견", "inv.proud": "[조수] 자신감",
-    "bg.club": "[배경] 요리 동아리실", "prop.card": "[소품] 명령 카드 태블릿", "prop.robot": "[소품] 요리 로봇 보글봇", "prop.pot": "[소품] 라면 냄비",
+    "bg.club": "[배경] 요리 동아리실", "prop.ramenpot": "[소품] 이상한 라면 냄비", "prop.card": "[소품] 명령 카드 태블릿", "prop.robot": "[소품] 요리 로봇 보글봇", "prop.pot": "[소품] 라면 냄비",
     "post.ramen": "[소품] 이상한 라면 사진",
     "clue.cond": "[단서] 거꾸로 된 조건", "clue.order": "[단서] 너무 빨리 끈 인덕션", "clue.result": "[단서] 퍼지고 딱딱한 면",
     "clue.fixed": "[단서] 제대로 된 라면", "clue.check": "[단서] 점검표", "clue.egg": "[단서] 삶은 달걀", "clue.bag": "[단서] 라면 봉지"
@@ -38,8 +38,8 @@ const CASE = {
   opening: {
     startLabel: "사건 시작하기",
     panels: [
-      { kind: "notify", caption: "오늘 점심, 별숲중 요리 동아리실", img: "prop.robot", bg: "bg.club", bgFront: 72,
-        app: "보글봇", time: "방금", head: "라면 완성!", body: "받은 명령을 모두 실행했어요." },
+      { kind: "notify", caption: "오늘 점심, 별숲중 요리 동아리실", img: "prop.robot", bg: "bg.club", bgFront: 72, thing: "prop.ramenpot",
+        app: "보글봇", head: "라면 완성!", body: "받은 명령을 모두 실행했어요." },
       { kind: "duo", caption: "요리 동아리의 도움 요청", bg: "bg.club",
         lines: [
           { who: "det", face: "serious", say: "로봇이 끓인 라면이 이상해." },
@@ -59,14 +59,13 @@ const CASE = {
   /* 탐정의 추리 하나 */
   hypotheses: [
     { id: "A", short: "명령 순서·조건 오류", text: "로봇이 받은 명령의 순서와 조건이 잘못됐다",
-      where: "명령 카드 · 요리 로봇",
+      where: "명령 카드, 요리 로봇",
       checks: [ { img: "prop.card", label: "명령 카드" }, { img: "prop.robot", label: "요리 로봇" } ] }
   ],
 
   evidence: {
     cond:   { title: "조건이 거꾸로: 끓지 않았다면", img: "clue.cond" },
     order:  { title: "인덕션을 너무 빨리 끔",         img: "clue.order" },
-    result: { title: "퍼지고 속은 딱딱한 면",       img: "clue.result" },
     fixed:  { title: "고친 명령 → 라면 완성",      img: "clue.fixed" },
     check:  { title: "아침 점검: 모두 정상",        img: "clue.check" },
     egg:    { title: "어제 달걀 삶기 성공",         img: "clue.egg" },
@@ -102,14 +101,13 @@ const CASE = {
             onHit: { who: "inv", face: "found", say: "여기가 이상해요!" },
             onMiss: { who: "det", face: "think", say: "그 명령은 문제없어 보여." },
             hints: ["면을 넣을 때 물은 어때야 할까?", "인덕션을 끄고 기다리면 면이 익을까?"],
-            done: { who: "det", face: "wow", say: "순서와 조건이 둘 다 수상해." },
-            give: ["result"]
+            done: { who: "det", face: "wow", say: "순서와 조건이 둘 다 수상해." }
           }]
         },
         { id: "robot", img: "prop.robot", x: 40, y: 340, w: 170, h: 230, r: 3, lockedLabel: "2단계" }
       ],
       hyp: { A: "likely" },
-      complete: { title: "수집 완료!", text: "수상한 명령 2곳과 이상한 라면을 증거 수첩에 모았어.", next: "확인 단계로 가기" }
+      complete: { title: "수집 완료!", text: "수상한 명령 2곳을 증거 수첩에 모았어.", next: "확인 단계로 가기" }
     },
     /* ---------- 2. 확인 ---------- */
     {
