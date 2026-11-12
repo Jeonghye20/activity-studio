@@ -82,7 +82,7 @@ const CASE = {
       ],
       idle: "'조사하기' 표시가 붙은 명령 카드를 눌러 보자",
       props: [
-        { id: "card", img: "prop.card", x: 40, y: 80, w: 150, h: 200, r: -5, label: "조사하기",
+        { id: "card", img: "prop.card", x: 40, y: 80, w: 150, h: 200, r: 3, label: "조사하기",
           modules: [{
             type: "search", name: "명령 카드 살펴보기", title: "보글봇 명령 카드",
             mission: "라면을 이상하게 만든 명령 2곳을 찾아 눌러 보자",
@@ -118,7 +118,7 @@ const CASE = {
       ],
       idle: "'조사하기' 표시가 붙은 요리 로봇을 눌러 보자",
       props: [
-        { id: "card", img: "prop.card", x: 50, y: 380, w: 110, h: 150, r: -8, doneLabel: "조사 끝" },
+        { id: "card", img: "prop.card", x: 50, y: 380, w: 110, h: 150, r: 3, doneLabel: "조사 끝" },
         { id: "robot", img: "prop.robot", x: 30, y: 80, w: 180, h: 240, r: 2, label: "조사하기",
           modules: [
             { type: "order", name: "① 명령 고쳐 다시 끓이기", title: "보글봇 · 명령 다시 넣기",
@@ -160,13 +160,13 @@ const CASE = {
                 text: "로봇이 고장 나서 라면을 이상하게 끓였을지도 몰라. 정말 그랬을까?"
               },
               groups: [
-                { title: "보글봇 작업 기록", sub: "어제 · 오늘", ids: ["r1", "r2", "r3"] },
+                { title: "보글봇 작업 기록", sub: "어제 · 오늘", ids: ["r2", "r1", "r3"] },
                 { title: "탐문 수사", sub: "동아리 친구들에게 물어본 말", ids: ["t1", "t2"] }
               ],
               items: [
-                { id: "r1", kind: "log", time: "오늘 08:30", text: "아침 점검 · 모든 부품", act: "정상" },
-                { id: "r2", kind: "log", time: "어제 15:10", text: "달걀 삶기 명령", act: "그대로 실행 · 성공" },
-                { id: "r3", kind: "log", time: "오늘 12:00", text: "라면 끓이기 명령", act: "그대로 실행", tag: "이번 사건" },
+                { id: "r1", kind: "log", time: "08:30", text: "오늘 아침 점검 · 모든 부품", act: "정상" },
+                { id: "r2", kind: "log", time: "15:10", text: "어제 달걀 삶기 명령", act: "그대로 실행 · 성공" },
+                { id: "r3", kind: "log", time: "12:00", text: "오늘 라면 끓이기 명령", act: "그대로 실행", tag: "이번 사건" },
                 { id: "t1", kind: "say", who: "동아리 친구 서준", text: "라면은 로봇한테 너무 어려운 요리예요." },
                 { id: "t2", kind: "say", who: "동아리 친구 하린", text: "로봇이 움직일 때 윙 소리가 났어요." }
               ],
