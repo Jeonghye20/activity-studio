@@ -87,14 +87,15 @@ const CASE = {
             type: "search", name: "명령 카드 살펴보기", title: "보글봇 명령 카드",
             mission: "라면을 이상하게 만든 명령 2곳을 찾아 눌러 보자",
             start: { who: "det", face: "think", say: "어느 명령이 수상할까?" },
+            codeTitle: "보글봇이 받은 명령", traceTitle: "로봇이 한 일",
             code: [
               { kind: "start", text: "라면 끓이기 시작" },
-              { kind: "", text: "[[x1|냄비에 물 550mL를 붓는다]]" },
-              { kind: "", text: "[[x2|인덕션을 켠다]]" },
-              { kind: "loop", text: "[[cond|만일 물이 끓지 않았다면]]" },
-              { kind: "", text: "면과 스프를 넣는다", indent: 1 },
-              { kind: "", text: "[[order|인덕션을 끈다]]" },
-              { kind: "", text: "[[x3|4분 30초 기다린다]]" }
+              { kind: "", text: "[[x1|냄비에 물 550mL를 붓는다]]", trace: "물 550mL · 20℃" },
+              { kind: "", text: "[[x2|인덕션을 켠다]]", trace: "인덕션 켜짐" },
+              { kind: "loop", text: "[[cond|만일 물이 끓지 않았다면]]", trace: "물 25℃ · 아직 안 끓음" },
+              { kind: "", text: "면과 스프를 넣는다", indent: 1, trace: "25℃ 물에 면과 스프 넣음" },
+              { kind: "", text: "[[order|인덕션을 끈다]]", trace: "인덕션 꺼짐 · 물 30℃" },
+              { kind: "", text: "[[x3|4분 30초 기다린다]]", trace: "미지근한 물에 면을 둠" }
             ],
             output: { img: "post.ramen", text: "면은 퍼지고 속은 딱딱해" },
             targets: ["cond", "order"],
