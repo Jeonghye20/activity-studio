@@ -28,7 +28,7 @@ const CASE = {
     "inv.default": "[조수] 기본", "inv.surprise": "[조수] 놀람", "inv.found": "[조수] 발견", "inv.proud": "[조수] 자신감",
     "prop.card": "[소품] 명령 카드 태블릿", "prop.robot": "[소품] 요리 로봇 보글봇", "prop.pot": "[소품] 라면 냄비",
     "post.ramen": "[소품] 이상한 라면 사진",
-    "clue.cond": "[단서] 거꾸로 된 조건", "clue.order": "[단서] 너무 빨리 끈 불", "clue.result": "[단서] 퍼지고 딱딱한 면",
+    "clue.cond": "[단서] 거꾸로 된 조건", "clue.order": "[단서] 너무 빨리 끈 인덕션", "clue.result": "[단서] 퍼지고 딱딱한 면",
     "clue.fixed": "[단서] 제대로 된 라면", "clue.check": "[단서] 점검표", "clue.egg": "[단서] 삶은 달걀", "clue.bag": "[단서] 라면 봉지"
   },
 
@@ -65,7 +65,7 @@ const CASE = {
 
   evidence: {
     cond:   { title: "조건이 거꾸로: 끓지 않았다면", img: "clue.cond" },
-    order:  { title: "불을 너무 빨리 끔",         img: "clue.order" },
+    order:  { title: "인덕션을 너무 빨리 끔",         img: "clue.order" },
     result: { title: "퍼지고 속은 딱딱한 면",       img: "clue.result" },
     fixed:  { title: "고친 명령 → 라면 완성",      img: "clue.fixed" },
     check:  { title: "아침 점검: 모두 정상",        img: "clue.check" },
@@ -91,17 +91,17 @@ const CASE = {
             code: [
               { kind: "start", text: "라면 끓이기 시작" },
               { kind: "", text: "[[x1|냄비에 물 550mL를 붓는다]]" },
-              { kind: "", text: "[[x2|불을 켠다]]" },
+              { kind: "", text: "[[x2|인덕션을 켠다]]" },
               { kind: "loop", text: "[[cond|만일 물이 끓지 않았다면]]" },
               { kind: "", text: "면과 스프를 넣는다", indent: 1 },
-              { kind: "", text: "[[order|불을 끈다]]" },
+              { kind: "", text: "[[order|인덕션을 끈다]]" },
               { kind: "", text: "[[x3|4분 30초 기다린다]]" }
             ],
             output: { img: "post.ramen", text: "면은 퍼지고 속은 딱딱해" },
             targets: ["cond", "order"],
             onHit: { who: "inv", face: "found", say: "여기가 이상해요!" },
             onMiss: { who: "det", face: "think", say: "그 명령은 문제없어 보여." },
-            hints: ["면을 넣을 때 물은 어때야 할까?", "불을 끄고 기다리면 면이 익을까?"],
+            hints: ["면을 넣을 때 물은 어때야 할까?", "인덕션을 끄고 기다리면 면이 익을까?"],
             done: { who: "det", face: "wow", say: "순서와 조건이 둘 다 수상해." },
             give: ["result"]
           }]
@@ -130,27 +130,27 @@ const CASE = {
               runLabel: "로봇에게 실행시키기",
               cards: [
                 { id: "noodle", text: "면과 스프를 넣는다" },
-                { id: "off", text: "불을 끈다" },
+                { id: "off", text: "인덕션을 끈다" },
                 { id: "water", text: "냄비에 물 550mL를 붓는다" },
                 { id: "wrongif", text: "만일 물이 끓지 않았다면 면과 스프를 넣는다" },
                 { id: "wait", text: "4분 30초 기다린다" },
-                { id: "fire", text: "불을 켠다" },
+                { id: "fire", text: "인덕션을 켠다" },
                 { id: "boil", text: "물이 끓을 때까지 기다린다" }
               ],
               answer: ["water", "fire", "boil", "noodle", "wait", "off"],
               fail: {
                 water: "물을 붓기 전에 다른 일을 했어!",
-                fire: "빈 냄비에 불을 켰어!",
-                boil: "불이 꺼져 있어서 물이 안 끓어!",
+                fire: "빈 냄비에 인덕션을 켰어!",
+                boil: "인덕션이 꺼져 있어서 물이 안 끓어!",
                 noodle: "물이 안 끓었는데 면을 넣었어!",
                 wrongif: "찬물에 면을 넣었어. 면이 퍼져!",
                 wait: "면도 없는데 기다리기만 했어.",
-                off: "불이 꺼져서 면이 안 익어!"
+                off: "인덕션이 꺼져서 면이 안 익어!"
               },
               winImg: "clue.fixed",
               winText: "라면 완성! 고친 명령대로 끓였어.",
               onMiss: { who: "det", face: "think", say: "어디서 이상해졌는지 보자." },
-              hints: ["면은 물이 끓은 다음에 넣어야 해.", "불은 4분 30초 기다린 다음에 꺼."],
+              hints: ["면은 물이 끓은 다음에 넣어야 해.", "인덕션은 4분 30초 기다린 다음에 꺼."],
               done: [ { who: "inv", face: "surprise", say: "이번엔 제대로 됐어요!" }, { who: "det", face: "wow", say: "추리가 맞았어!" } ],
               give: ["fixed"], hyp: { A: "confirmed" }
             },
