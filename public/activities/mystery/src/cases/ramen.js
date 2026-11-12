@@ -38,7 +38,7 @@ const CASE = {
   opening: {
     startLabel: "사건 시작하기",
     panels: [
-      { kind: "notify", caption: "오늘 점심, 별숲중 요리 동아리실", img: "prop.robot", bg: "bg.club",
+      { kind: "notify", caption: "오늘 점심, 별숲중 요리 동아리실", img: "prop.robot", bg: "bg.club", bgFront: 72,
         app: "보글봇", time: "방금", head: "라면 완성!", body: "받은 명령을 모두 실행했어요." },
       { kind: "duo", caption: "요리 동아리의 도움 요청", bg: "bg.club",
         lines: [
