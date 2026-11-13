@@ -34,8 +34,8 @@ export const CLASS_COLOR_MAP: Record<string, { bg: string; text: string }> = {
 const DEMO_DEPLOY_LOG: DeployLog[] = [
   {
     id: 'demo-dl-1',
-    worksheetId: 'ws-logic',
-    worksheetTitle: '놀이공원 입장료 예측표',
+    worksheetId: 'ws-physical',
+    worksheetTitle: '센서가 알아채고, 장치가 움직인다',
     worksheetType: 'concept',
     cls: '2학년 3반',
     deployedDate: '2026-11-10',

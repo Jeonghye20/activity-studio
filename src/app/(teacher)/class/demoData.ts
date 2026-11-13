@@ -55,8 +55,8 @@ export const FEEDBACK_LABELS: Record<FeedbackValue, string> = {
 
 /* ── 반별 결과 전체 데이터 ── */
 export const ALL_CLASS_RESULTS = [
-  { title: '놀이공원 입장료 예측표', cls: '2학년 3반', submitted: '15/24', status: 'resubmit', wrongBlock: '문항 2' },
-  { title: '놀이공원 입장료 예측표', cls: '1반', submitted: '24/24', status: 'feedback', wrongBlock: '문항 2' },
+  { title: '센서가 알아채고, 장치가 움직인다', cls: '2학년 3반', submitted: '15/24', status: 'resubmit', wrongBlock: '문항 2' },
+  { title: '센서가 알아채고, 장치가 움직인다', cls: '1반', submitted: '24/24', status: 'feedback', wrongBlock: '문항 2' },
   { title: '버그 탐정: 고장 난 블록 찾기', cls: '1반', submitted: '24/24', status: 'done', wrongBlock: '문항 2' },
   { title: '0과 1로 그림 보내기', cls: '2반', submitted: '24/24', status: 'done', wrongBlock: '문항 2' },
 ];
@@ -66,8 +66,8 @@ export const CLASS_RESULTS = ALL_CLASS_RESULTS;
 
 /* ── 학생별 기록 전체 데이터 ── */
 export const ALL_STUDENT_RECORDS = [
-  { title: '놀이공원 입장료 예측표', feedback: 'good' as FeedbackValue, student: '김oo' },
-  { title: '놀이공원 입장료 예측표', feedback: null, student: '이서연' },
+  { title: '센서가 알아채고, 장치가 움직인다', feedback: 'good' as FeedbackValue, student: '김oo' },
+  { title: '센서가 알아채고, 장치가 움직인다', feedback: null, student: '이서연' },
   { title: '버그 탐정: 고장 난 블록 찾기', feedback: 'good' as FeedbackValue, student: '이서연' },
   { title: '0과 1로 그림 보내기', feedback: 'good' as FeedbackValue, student: '이서연' },
 ];
@@ -104,7 +104,7 @@ export const AI_DEMO_ENTRIES: Array<{ match: string; response: AiDemoResponse }>
   {
     match: '피드백',
     response: {
-      text: '피드백 아직 안 보낸 수업 1개예요 — 놀이공원 입장료 예측표 1반. 바로 이동할까요?',
+      text: '피드백 아직 안 보낸 수업 1개예요 — 센서가 알아채고, 장치가 움직인다 1반. 바로 이동할까요?',
       filter: 'nofeedback',
     },
   },

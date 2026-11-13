@@ -24,7 +24,7 @@ const LIVE_CLASSES = [
   {
     id: 'cls3',
     cls: '2학년 3반',
-    title: '놀이공원 입장료 예측표',
+    title: '센서가 알아채고, 장치가 움직인다',
     submitted: 15,
     total: 24,
     inProgress: 6,
@@ -107,7 +107,7 @@ const SUMMARY_CARDS = [
 /* ── 수업 기록 탭 — 반별 결과 ── */
 const HISTORY_ROWS = [
   {
-    title: '놀이공원 입장료 예측표',
+    title: '센서가 알아채고, 장치가 움직인다',
     cls: '2학년 3반',
     submitted: 15,
     inProgress: 6,
@@ -350,8 +350,8 @@ export default function ClassDashboard() {
                 <span style={{ fontSize: 8, color: '#f59e0b' }}>●</span>
                 지금 수업 중
               </span>
-              <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: 'var(--ink)', lineHeight: 1.3 }}>
-                놀이공원 입장료 예측표
+              <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: 'var(--ink)', lineHeight: 1.3, wordBreak: 'keep-all' }}>
+                센서가 알아채고, 장치가 움직인다
               </p>
               <p style={{ margin: 0, fontSize: 13, color: 'var(--ink-3)', fontWeight: 500 }}>
                 2학년 3반 · 3교시 · 개념 확인
@@ -361,6 +361,22 @@ export default function ClassDashboard() {
                 <BigStat value="62%" label="제출률" />
                 <BigStat value="문항 2" label="가장 많이 막힘" small />
               </div>
+              {/* 종이 제출 피드백 진입 */}
+              <Link
+                href="/class/paper?code=T7Y75"
+                style={{
+                  marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 6,
+                  height: 40, padding: '0 14px', borderRadius: 10,
+                  border: '1.5px solid var(--line)', background: '#fff',
+                  color: 'var(--ink)', fontSize: 13.5, fontWeight: 800,
+                  textDecoration: 'none', width: 'fit-content',
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" />
+                </svg>
+                종이로 낸 활동지 피드백 →
+              </Link>
             </div>
 
             {/* 가운데 — 학생 칸 판 */}
@@ -1051,7 +1067,7 @@ export default function ClassDashboard() {
 
               <div style={{ borderTop: '1px solid var(--line)', marginTop: 12, paddingTop: 12 }}>
                 <p style={{ margin: '0 0 4px', fontSize: 12, color: 'var(--ink-3)' }}>
-                  놀이공원 입장료 예측표 · 24명 중 4명 표시
+                  센서가 알아채고, 장치가 움직인다 · 24명 중 4명 표시
                 </p>
                 <Link href="/class-roster" style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>
                   학생 전체 기록은 학급 관리에서 →
