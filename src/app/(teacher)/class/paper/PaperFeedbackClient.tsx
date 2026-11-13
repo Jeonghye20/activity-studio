@@ -20,10 +20,10 @@ const INK2 = '#5d6880';
 const LINE = '#e3e7ef';
 
 const DEFAULT_CODE = 'T7Y75';
-const SHEET_ID = 'ws-logic';
-const SHEET_TITLE = '놀이공원 입장료 예측표';
+const SHEET_ID = 'ws-physical';
+const SHEET_TITLE = '센서가 알아채고, 장치가 움직인다';
 const CLASS_LABEL = '2학년 3반';
-const RETRY_NUMBERS = [1, 2, 3, 4];
+const RETRY_NUMBERS = [1, 2, 3, 4, 5];
 const MAX_SIDE = 1600;
 const JPEG_QUALITY = 0.7;
 const SAVE_FAIL_MSG = '사진 용량이 커서 저장하지 못했어요. 다시 찍어 주세요.';
