@@ -33,7 +33,7 @@ def inline(case):
         mime='image/jpeg' if path.endswith('.jpg') else 'image/png'
         return '"data:%s;base64,%s"' % (mime, base64.b64encode(open(path,'rb').read()).decode())
     return re.sub(r'"(assets/[^"]+)"', rep, case)
-for name in ['privacy','debug']:
+for name in ['privacy','debug','ramen']:
     case = open(f'src/cases/{name}.js').read()
     title = re.search(r'title: "([^"]+)"', case).group(1)
     chars = open('src/characters.js').read()

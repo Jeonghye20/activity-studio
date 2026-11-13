@@ -618,6 +618,147 @@ html,body{height:100%;overflow:hidden}
 
 .tok.ans{outline:none!important;border-color:var(--green);border-style:dashed;background:var(--green-l)}
 .tok.ans::after{display:none}
+/* 게시물 사진: 잘리지 않게 원본 비율(2:1) 유지, 화면이 넓어도 너무 커지지 않게 */
+.post-img{height:auto!important;aspect-ratio:2/1;width:100%;max-width:520px;margin:0 auto}
+.post-img .img{object-fit:contain}
+
+/* 모듈: 순서 복원 */
+.ord{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px}
+.ord-slots{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ord-slot{width:100%;min-height:38px;display:flex;align-items:center;gap:8px;text-align:left;border:2px dashed #B0B8CF;border-radius:9px;padding:5px 10px 5px 6px;background:#fff;font-size:14px;color:#868E96;word-break:keep-all}
+.ord-slot i{flex:none;width:24px;height:24px;border-radius:50%;background:#E9ECEF;color:var(--sub);font-style:normal;font-size:12px;font-weight:700;display:grid;place-items:center}
+.ord-slot.next{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+.ord-slot.filled{border:2px solid #74C0FC;background:#E7F5FF;color:#0B4F87;font-weight:500;cursor:pointer}
+.ord-slot.filled i{background:#fff;color:#0B4F87}
+.ord-slot.run{box-shadow:0 0 0 4px var(--purple-ring);border-color:var(--purple)}
+.ord-slot.ok{border-color:var(--green);background:var(--green-l);color:var(--green)}
+.ord-slot.ok i{background:var(--green);color:#fff}
+.ord-slot.bad{border-color:var(--red);background:var(--red-l);color:var(--red);animation:shake .4s}
+.ord-slot.bad i{background:var(--red);color:#fff}
+.ord-cards{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.ord-card{position:relative;text-align:left;border:2px solid var(--line);background:#fff;border-radius:9px;padding:6px 10px;font-size:14px;font-weight:500;word-break:keep-all}
+.ord-card:hover:not(:disabled){border-color:var(--purple);background:var(--purple-l)}
+.ord-card:disabled{opacity:.3;cursor:default}
+.ord-ans{position:absolute;right:-8px;top:-8px;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:12px;display:grid;place-items:center}
+.ord-robot{margin-top:10px;font-size:14px;font-weight:700;color:var(--purple)}
+.ord-ok{display:flex;align-items:center;gap:10px}
+.ord-win{flex:none;width:52px;height:52px;border-radius:8px;overflow:hidden;background:#fff}
+.ord-win .ph{height:100%;font-size:9px;padding:2px}
+#oRes .result{margin-top:8px;padding:8px 12px;font-size:14px}
+.ord-card.ans::after{display:none}
+
+
+
+
+
+
+
+
+
+
+
+
+/* 오프닝 컷: 장면 배경(bg)이 있는 알림 컷 · 대화 컷 */
+.c-scene{position:absolute;inset:0;z-index:0}
+.c-scene .img{object-fit:cover}
+.c-scene-wrap{justify-content:flex-end;padding:44px 22px 18px}
+.c-scene-img{position:absolute;left:8%;bottom:6%;width:32%;height:80%;z-index:1}
+.c-scene-front{z-index:1}
+.c-scene-front ~ .c-noti,.c-scene-wrap .c-noti{z-index:2}
+.c-scene-img .img{object-fit:contain;object-position:bottom}
+.c-scene-wrap .c-noti{position:relative;z-index:2;box-shadow:3px 3px 0 var(--ink)}
+.c-duo.has-bg::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.28);z-index:0}
+.c-duo > .c-big,.c-duo > .c-duo-talk{position:relative;z-index:1}
+/* 대화 컷: 말풍선을 말하는 사람 얼굴 높이로 */
+.c-duo-talk{align-self:end;justify-content:flex-end;padding:0 0 64px}
+.c-duo-talk .c-bubble.tail-l{margin-right:auto}
+.c-duo-talk .c-bubble.tail-r{margin-left:auto}
+.c-big{height:190px} .c-big.inv{height:178px}
+.c-duo{grid-template-columns:170px minmax(0,1fr) 160px;padding:44px 6px 0;gap:4px}
+.c-big{height:220px} .c-big.inv{height:206px}
+.c-duo-talk{padding:0 0 86px}
+.c-duo-talk .c-bubble{word-break:keep-all}
+
+/* 장면 알림 컷: 소품(로봇)이 말하는 말풍선 + 조리대 위 물건 */
+.c-scene-thing{position:absolute;left:30%;bottom:9%;width:28%;height:38%;z-index:2}
+.c-scene-thing .img{object-fit:contain;object-position:bottom}
+.c-scene-wrap{justify-content:flex-start;align-items:flex-start;padding:0}
+.c-robot-say{position:absolute!important;left:40%;top:18%;max-width:46%;border-radius:16px;box-shadow:none!important}
+.c-robot-say.tail-l::before{bottom:auto;top:22px}
+
+/* 다음 컷으로 넘어갈 때 이미 본 컷의 말풍선·알림이 다시 튀어나오지 않게 */
+.cut:not(.now) .c-noti{animation:none}
+.th-where{word-break:keep-all}
+
+/* 진행 단계: 지난 단계 다시 보기 */
+button.st:not(.st-case){background:none;border:0;padding:2px 4px;border-radius:999px;font:inherit;cursor:pointer}
+button.st.st-go:hover{background:var(--purple-l)}
+.st.view{color:var(--purple)} .st.view i{border-color:var(--purple);background:var(--purple);color:#fff}
+.mission.review{background:#E5DBFF}
+.mission.review .mis-hint{background:var(--purple);color:#fff;border-color:var(--ink)}
+.prop.revisit{cursor:pointer}
+.prop.revisit:hover{filter:drop-shadow(0 0 6px var(--purple-ring))}
+button.zs{background:none;border:0;font:inherit;cursor:pointer;padding:0}
+/* 수집: 명령 | 로봇이 한 일 표 + 실행 결과 띠 */
+.trace{border:2px solid var(--line);border-radius:12px;background:#F8F9FC;padding:6px 10px}
+.tr-h{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px;font-size:12px;font-weight:700;color:var(--sub);padding:2px 4px 4px}
+.tr-row{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px;align-items:center;border-top:1px dashed var(--line);padding:2px 0}
+.tr-row .cl{font-size:14px}
+.tr-row .blk{padding:3px 12px}
+.tr-do{font-size:13.5px;color:var(--ink);word-break:keep-all}
+.out-strip{display:flex;gap:12px;align-items:center;margin-top:8px;padding:8px 10px}
+.out-strip .out-img{width:150px;height:75px;flex:none;margin:0}
+.out-strip p{font-size:19px}
+
+/* 순서 복원 v2: 프로그램 + 블록 상자 / 실행 화면 */
+.ord2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px}
+.o2-t{font-size:12.5px;font-weight:700;color:var(--sub);margin-bottom:6px}
+.o2-prog{background:#F8F9FC;border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.o2-start{margin-bottom:4px}
+.o2-slots{list-style:none;margin:0 0 8px;padding:0 0 0 14px;display:flex;flex-direction:column;gap:4px;border-left:3px solid #69DB7C;margin-left:10px}
+.o2-slot{width:100%;min-height:36px;display:flex;align-items:center;gap:8px;text-align:left;border:2px solid transparent;border-radius:9px;padding:2px 6px 2px 2px;background:none;font:inherit;word-break:keep-all}
+.o2-slot i{flex:none;width:22px;height:22px;border-radius:50%;background:#E9ECEF;color:var(--sub);font-style:normal;font-size:11.5px;font-weight:700;display:grid;place-items:center}
+.o2-slot.empty{border:2px dashed #B0B8CF;background:#fff;color:#868E96;font-size:13.5px}
+.o2-slot.empty.next{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+.o2-slot.filled{cursor:pointer}
+.o2-slot.filled:hover:not(:disabled) .blk{text-decoration:line-through;opacity:.7}
+.o2-slot .blk{font-size:14px;padding:4px 10px}
+.o2-slot.run{border-color:var(--purple);background:var(--purple-l);box-shadow:0 0 0 3px var(--purple-ring)}
+.o2-slot.run i{background:var(--purple);color:#fff}
+.o2-slot.ok i{background:var(--green);color:#fff}
+.o2-slot.bad{border-color:var(--red);background:var(--red-l);animation:shake .4s}
+.o2-slot.bad i{background:var(--red);color:#fff}
+.o2-slot:disabled{cursor:default;color:inherit}
+.o2-box{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.o2-card{position:relative;background:none;border:0;padding:0;font:inherit;text-align:left;word-break:keep-all}
+.o2-card .blk{font-size:14px;padding:5px 12px;box-shadow:0 2px 0 rgba(31,42,85,.15);transition:transform .1s}
+.o2-card:hover:not(:disabled) .blk{transform:translateX(-4px);box-shadow:0 0 0 3px var(--purple-ring)}
+.o2-card:disabled{opacity:.25;cursor:default}
+.o2-card.ans::after{display:none}
+.o2-run{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;align-items:center;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:#fff}
+.o2-robot{height:110px}
+.o2-robot .img{object-fit:contain}
+.o2-robot.busy{animation:bob 0.8s ease-in-out infinite}
+.o2-state{display:flex;flex-direction:column;gap:5px}
+.o2-g{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:6px;font-size:13px}
+.o2-g span{color:var(--sub);font-weight:700}
+.o2-g b{grid-column:2/4;font-size:13.5px}
+.o2-g .o2-bar + b{grid-column:auto}
+.o2-bar{height:10px;border-radius:5px;background:#E9ECEF;overflow:hidden}
+.o2-bar i{display:block;height:100%;transition:width .5s,background .5s}
+.o2-g b.on{color:var(--red)} .o2-g b.off{color:var(--sub)}
+.o2-log{margin-top:8px;min-height:40px;font-size:13.5px;background:#1F2A55;color:#fff;border-radius:10px;padding:8px 10px;line-height:1.45;word-break:keep-all}
+.o2-log em{font-style:normal;color:#FFD43B}
+#oRes .btn-sub{margin-top:6px;height:34px}
+.o2-prog .row{gap:8px}
+.o2-prog .row .btn-main{flex:1;white-space:nowrap;font-size:16px;padding:0 12px;height:40px}
+.o2-prog .row .btn-sub{white-space:nowrap;font-size:14px;padding:0 12px;height:40px}
+.o2-slot{min-height:33px}
+.o2-slots{gap:3px}
+.o2-log{margin-top:6px;min-height:0;padding:6px 10px}
+#oRes .result{margin-top:6px}
+.o2-prog{padding:7px 12px 8px}
+.o2-t{margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -837,12 +978,16 @@ function art(key, cls){
 const S = {};
 function reset(fresh){
   if (fresh) clearSave();
-  Object.assign(S, { links:null, boardLinked:false, boardPos:null, stage:0, open:null, mod:0, modDone:{}, evidence:[], seen:0, hyp:{}, hints:0, tries:0, start:Date.now(), solved:false, line:null, reply:null });
+  Object.assign(S, { links:null, boardLinked:false, boardPos:null, stage:0, reviewFrom:null, open:null, mod:0, modDone:{}, evidence:[], seen:0, hyp:{}, hints:0, tries:0, start:Date.now(), solved:false, line:null, reply:null });
   CASE.hypotheses.forEach(h => S.hyp[h.id] = 'open');
   S.pointer = true;
   try { S.asst = +localStorage.getItem(ASST_KEY) || null; } catch(e){ S.asst = null; }
   const saved = fresh ? null : loadSave();
-  if (saved){ Object.assign(S, saved); S.links = new Set(saved.links || []); S.start = Date.now() - (saved.sec||0)*1000; }
+  if (saved){ Object.assign(S, saved); S.links = new Set(saved.links || []); S.start = Date.now() - (saved.sec||0)*1000;
+    /* 사건 데이터가 바뀌어 없어진 증거는 저장에서 빼기 */
+    S.evidence = (S.evidence || []).filter(id => CASE.evidence[id]);
+    S.links = new Set([...S.links].filter(id => CASE.evidence[id]));
+    if (!CASE.stages[S.stage]) S.stage = 0; }
   const begin = () => { if (saved) enterStage(); else if (CASE.opening){ S.cut = 0; renderOpening(); } else enterStage(); };
   if (CHARS && !S.asst) renderPicker(begin); else begin();
 }
@@ -850,7 +995,7 @@ function reset(fresh){
 /* ---------- 진행 저장 (정답 보기에서는 저장하지 않음) ---------- */
 function save(){
   if (ANSWERS || S.solved) return;
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ stage:S.stage, evidence:S.evidence, seen:S.evidence.length, hyp:S.hyp, modDone:S.modDone,
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ stage:(S.reviewFrom ?? S.stage), evidence:S.evidence, seen:S.evidence.length, hyp:S.hyp, modDone:S.modDone,
     links:[...(S.links||[])], boardLinked:S.boardLinked, boardPos:S.boardPos, hints:S.hints, tries:S.tries, sec:Math.round((Date.now()-S.start)/1000) })); } catch(e){}
 }
 function loadSave(){ if (ANSWERS) return null; try { return JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch(e){ return null; } }
@@ -915,12 +1060,34 @@ function renderPicker(after){
 function stepsHTML(inOpening){
   const caseBtn = CASE.opening ? `<button class="st st-case ${inOpening?'now':''}" id="caseBtn" ${inOpening?'aria-current="step"':''}><i>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg></i>사건</button><span class="st-bar ${inOpening?'':'done'}"></span>` : '';
+  /* 지금 단계(cur)까지는 눌러서 이동: 지난 단계는 다시 보기, 지금 단계는 돌아가기 */
+  const cur = S.reviewFrom ?? S.stage, opReview = inOpening && S.review;
   return `<nav class="steps" aria-label="진행 단계">${caseBtn}${CASE.stages.map((s,k)=>{
-    const done = !inOpening && (k<S.stage||S.solved), now = !inOpening && k===S.stage && !S.solved;
-    return `${k?`<span class="st-bar ${!inOpening&&k<=S.stage?'done':''}"></span>`:''}<span class="st ${done?'done':now?'now':''}"><i>${done?'✓':k+1}</i>${esc(s.step)}</span>`;
+    const done = (!inOpening || opReview) && (k<cur||S.solved), now = !inOpening && k===cur && !S.solved;
+    const view = !inOpening && S.reviewFrom != null && k === S.stage;
+    const go = (!inOpening || opReview) && !S.solved && k <= cur && !(now && S.reviewFrom == null);
+    const inner = `<i>${done?'✓':k+1}</i>${esc(s.step)}`;
+    const cls = `st ${done?'done':''} ${now&&!view?'now':''} ${view?'view':''}`;
+    return `${k?`<span class="st-bar ${(!inOpening||opReview)&&k<=cur?'done':''}"></span>`:''}${go
+      ? `<button class="${cls} st-go" data-k="${k}" title="${k<cur?esc(s.step)+' 다시 보기':esc(s.step)+' 단계로 돌아가기'}" ${view?'aria-current="step"':''}>${inner}</button>`
+      : `<span class="${cls}" ${now?'aria-current="step"':''}>${inner}</span>`}`;
   }).join('')}</nav>`;
 }
+function bindStepBtns(){
+  document.querySelectorAll('.st-go').forEach(b => b.onclick = () => { S.inOpening = false; S.review = false; goStage(+b.dataset.k); });
+}
+/* 지난 단계 다시 보기 · 지금 단계로 돌아가기 */
+function goStage(k){
+  const cur = S.reviewFrom ?? S.stage;
+  if (k > cur) return;
+  S.open = null; S.mod = 0;
+  if (k === cur){ S.stage = cur; S.reviewFrom = null; enterStage(); return; }
+  S.reviewFrom = cur; S.stage = k;
+  S.line = { who:'det', face:'default', say: CASE.stages[k].step + ' 단계를 다시 보자.' }; S.reply = { face:'default', say:'' };
+  render();
+}
 function bindCaseBtn(){
+  bindStepBtns();
   const b = $('#caseBtn'); if (!b) return;
   b.onclick = () => { if (S.inOpening) return; S.review = true; S.cut = CASE.opening.panels.length-1; renderOpening(); };
 }
@@ -946,14 +1113,18 @@ function renderOpening(){
   if ($('#back')) { $('#back').onclick = () => { S.inOpening = false; S.review = false; render(); }; $('#back').focus(); }
   if ($('#nextCut')) $('#nextCut').onclick = () => { S.cut++; renderOpening(); };
   if ($('#skip')) $('#skip').onclick = () => { S.cut = n-1; renderOpening(); };
-  bindTools();
+  bindTools(); bindStepBtns();
   if ($('#start')) { $('#start').onclick = go; $('#start').focus(); } else if ($('#nextCut')) $('#nextCut').focus();
 }
 function panelHTML(p, k){
   const bubbles = (p.lines||[]).map(l => `
     <div class="c-say ${l.who}"><div class="c-face">${art((l.who==='det'?'det.':'inv.')+(l.face||'default'))}</div><div class="c-bubble ${l.who==='det'?'tail-l':'inv tail-r'}">${esc(l.say)}</div></div>`).join('');
   let body = '';
-  if (p.kind === 'notify'){
+  if (p.kind === 'notify' && p.bg){
+    /* 장면 배경 위에 소품과 알림 */
+    body = `<div class="c-phone c-scene-wrap"><div class="c-scene">${art(p.bg)}</div><div class="c-scene-img">${art(p.img)}</div>${p.bgFront?`<div class="c-scene c-scene-front" style="clip-path:inset(${+p.bgFront}% 0 0 0)">${art(p.bg)}</div>`:''}${p.thing?`<div class="c-scene-thing">${art(p.thing)}</div>`:''}
+      <div class="c-noti c-robot-say tail-l"><small>${esc(p.app||'알림')}</small><b>${esc(p.head)}</b>${esc(p.body)}</div></div>`;
+  } else if (p.kind === 'notify'){
     body = `<div class="c-phone"><div class="c-phone-img">${art(p.img)}</div>
       <div class="c-noti"><small>${esc(p.app||'알림')} · ${esc(p.time||'방금')}</small><b>${esc(p.head)}</b>${esc(p.body)}</div></div>`;
   } else if (p.kind === 'photo'){
@@ -962,7 +1133,7 @@ function panelHTML(p, k){
     /* 탐정·수사원이 크게 나와 대화하는 컷 */
     const [a,b] = p.lines||[];
     return `${p.caption?`<div class="c-cap">${esc(p.caption)}</div>`:''}
-      <div class="c-duo">
+      <div class="c-duo${p.bg?' has-bg':''}">${p.bg?`<div class="c-scene">${art(p.bg)}</div>`:''}
         <div class="c-big det">${art('det.'+((a&&a.face)||'default'))}</div>
         <div class="c-duo-talk">${a?`<div class="c-bubble tail-l">${esc(a.say)}</div>`:''}${b?`<div class="c-bubble inv tail-r">${esc(b.say)}</div>`:''}</div>
         <div class="c-big inv">${art('inv.'+((b&&b.face)||'default'))}</div>
@@ -1048,6 +1219,7 @@ function render(){
 
 /* 정답 보기: 이 단계를 정답으로 끝내고 다음으로 */
 function skipStage(){
+  if (S.reviewFrom != null){ goStage(S.reviewFrom); return; }
   const st = stage();
   if (S.solved) return;
   if (st.kind === 'desk'){
@@ -1090,7 +1262,7 @@ function renderNote(){
     <div class="theory ${S.hyp[h.id]}">
       <div class="th-top"><span class="th-t">탐정의 추리</span><span class="th-state">${HYP_LABEL[S.hyp[h.id]]}</span></div>
       <p class="th-text">${esc(h.text)}</p>
-      ${h.where?`<div class="th-where">확인할 곳 · ${esc(h.where)}</div>`:''}
+      ${h.where?`<div class="th-where">확인할 곳: ${esc(h.where)}</div>`:''}
     </div>`; })() : `<div class="hyps"><div class="hyps-t">용의 방법</div>${CASE.hypotheses.map(h=>`
       <div class="hyp ${S.hyp[h.id]}">${THEORY?'':`<b>${h.id}</b>`}<span>${esc(THEORY?h.text:h.short)}${h.where?`<small class="hyp-where">확인: ${esc(h.where)}</small>`:''}</span><em>${HYP_LABEL[S.hyp[h.id]]}</em></div>`).join('')}</div>`}`;
   S.seen = S.evidence.length;
@@ -1101,6 +1273,13 @@ function give(ids){ (ids||[]).forEach(id => { if (!S.evidence.includes(id)) S.ev
 function setHyp(m){ Object.assign(S.hyp, m||{}); renderNote(); save(); }
 function setMission(text, count){
   const m = $('#mission'); if (!m) return;
+  if (S.reviewFrom != null){
+    const back = CASE.stages[S.reviewFrom].step;
+    m.classList.add('review');
+    m.innerHTML = `<span class="mis-t">다시 보기 · ${esc(stage().step)} 단계에서 찾은 것</span><button class="mis-hint" id="backCur">${esc(back)} 단계로 돌아가기 ▶</button>`;
+    $('#backCur').onclick = () => goStage(S.reviewFrom);
+    return;
+  }
   m.innerHTML = `<span class="mis-t">할 일 · ${esc(text)}${count?` <b>${count}</b>`:''}</span>
     <button class="mis-hint" id="hintBtn" title="탐정에게 도움말 듣기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg>도움말</button>`;
   $('#hintBtn').onclick = giveHint;
@@ -1129,14 +1308,19 @@ function renderDesk(st){
       ${active?'':'tabindex="-1" aria-disabled="true"'} aria-label="${esc(CASE.assetLabels[p.img]||p.id)}">
       <div class="prop-box">${art(p.img)}</div>${tag?`<span class="prop-tag">${esc(tag)}</span>`:''}</button>`;
   }).join('') + `<div id="zoomArea"></div>`;
+  if (S.reviewFrom != null) el.querySelectorAll('.prop.done').forEach(b => {
+    const p = st.props.find(x => x.id === b.dataset.id); if (!p || !p.modules) return;
+    b.classList.add('revisit'); b.removeAttribute('tabindex'); b.removeAttribute('aria-disabled');
+    b.onclick = () => { S.open = b.dataset.id; S.mod = 0; openZoom(st); };
+  });
   el.querySelectorAll('.prop.active').forEach(b => b.onclick = () => { S.pointer = false; $('#hand')&&$('#hand').remove(); S.open = b.dataset.id; S.mod = 0; openZoom(st); });
   const first = el.querySelector('.prop.active');
-  if (S.pointer && first && !S.open){
+  if (S.pointer && first && !S.open && S.reviewFrom == null){
     el.insertAdjacentHTML('beforeend', `<div class="hand" id="hand" aria-hidden="true" style="left:${first.offsetLeft+first.offsetWidth-30}px;top:${first.offsetTop+first.offsetHeight-20}px">
       <svg width="54" height="54" viewBox="0 0 24 24" fill="#fff" stroke="#1F2A55" stroke-width="1.4" stroke-linejoin="round"><path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V10l.5-.1a1.5 1.5 0 0 1 2.9.6l.1.3a1.5 1.5 0 0 1 2.8.8V13a1.5 1.5 0 0 1 2.7.9V16a6 6 0 0 1-6 6h-1.8a6 6 0 0 1-4.6-2.2L4.6 15a1.6 1.6 0 0 1 2.4-2.1L9 15z"/></svg></div>`);
   }
   if (S.open) openZoom(st);
-  else { $('#zoomArea').innerHTML = `<div class="idle">${esc(st.idle)}</div>`; setMission(st.idle); }
+  else { $('#zoomArea').innerHTML = `<div class="idle">${S.reviewFrom != null ? '\'조사 끝\' 소품을 누르면 그때 찾은 것을 다시 볼 수 있어' : esc(st.idle)}</div>`; setMission(st.idle); }
 }
 
 function openZoom(st){
@@ -1145,12 +1329,16 @@ function openZoom(st){
   $('#zoomArea').innerHTML = `
     <section class="zoom ${p.frame||''}" aria-label="${esc(m.name)}">
       <div class="zoom-head">${p.frame==='laptop'?'<span class="win-dots" aria-hidden="true"><i></i><i></i><i></i></span>':''}<span class="jua">${esc(m.title || (CASE.assetLabels[p.img]||'').replace(/\[.*?\]\s*/,''))}</span></div>
-      ${p.modules.length>1?`<div class="zoom-steps">${p.modules.map((x,k)=>`${k?'<span class="zs-bar"></span>':''}<span class="zs ${k<S.mod?'done':k===S.mod?'now':''}"><i>${k<S.mod?'✓':k+1}</i>${esc(x.name.replace(/^[①②③④]\s*/,''))}</span>`).join('')}</div>`:''}
+      ${p.modules.length>1?`<div class="zoom-steps">${p.modules.map((x,k)=>{ const rv = S.reviewFrom != null, d = rv || k<S.mod;
+        const inner = `<i>${d?'✓':k+1}</i>${esc(x.name.replace(/^[①②③④]\s*/,''))}`;
+        return `${k?'<span class="zs-bar"></span>':''}${rv?`<button class="zs done ${k===S.mod?'now':''}" data-m="${k}">${inner}</button>`:`<span class="zs ${k<S.mod?'done':k===S.mod?'now':''}">${inner}</span>`}`; }).join('')}</div>`:''}
       <div class="zoom-body" id="zb"></div>
     </section>`;
   setMission(m.mission);
-  if (m.start){ clearTimeout(talkTimer); S.line = { ...m.start }; S.reply = { face: S.reply ? S.reply.face : 'default', say: '' }; renderTalk(); }
-  MODULES[m.type](m, $('#zb'), () => finishModule(st, p, m));
+  if (m.start && S.reviewFrom == null){ clearTimeout(talkTimer); S.line = { ...m.start }; S.reply = { face: S.reply ? S.reply.face : 'default', say: '' }; renderTalk(); }
+  const review = S.reviewFrom != null;
+  if (review) document.querySelectorAll('.zoom-steps button.zs').forEach(b => b.onclick = () => { S.mod = +b.dataset.m; openZoom(st); });
+  MODULES[m.type](m, $('#zb'), review ? () => {} : () => finishModule(st, p, m), review);
 }
 
 function finishModule(st, p, m){
@@ -1196,6 +1384,15 @@ const MODULES = {
           <div class="code">${m.code.map(l=>`<div class="cl" style="padding-left:${(l.indent||0)*28+12}px"><span class="blk ${l.kind||''}">${tok(l.text)}</span></div>`).join('')}</div>
           ${m.output?`<div class="out"><div class="out-t">실행 결과</div>${m.output.img?`<div class="out-img">${art(m.output.img)}</div>`:''}<p>${tok(m.output.text)}</p></div>`:''}
         </div>`;
+      /* 실행 추적(trace)이 있으면: 명령 | 로봇이 한 일 표 + 아래 실행 결과 띠 */
+      if (m.code.some(l => l.trace)){
+        el.innerHTML = `
+          <div class="trace">
+            <div class="tr-h"><span>${esc(m.codeTitle||'명령')}</span><span>${esc(m.traceTitle||'로봇이 한 일')}</span></div>
+            ${m.code.map(l=>`<div class="tr-row"><div class="cl" style="padding-left:${(l.indent||0)*24+8}px"><span class="blk ${l.kind||''}">${tok(l.text)}</span></div><div class="tr-do">${l.trace?esc(l.trace):''}</div></div>`).join('')}
+          </div>
+          ${m.output?`<div class="out out-strip">${m.output.img?`<div class="out-img">${art(m.output.img)}</div>`:''}<div><div class="out-t">실행 결과</div><p>${tok(m.output.text)}</p></div></div>`:''}`;
+      }
     } else {
       el.innerHTML = `
         <div class="post-top"><span class="avatar"></span><div><div class="post-id">${esc(m.post.author)}</div><div class="post-sub">${esc(m.post.sub)}</div></div></div>
@@ -1267,7 +1464,7 @@ const MODULES = {
   },
 
   /* 증거 고르기: 기록·진술에서 정답 묶음 고르기 */
-  select(m, el, done){
+  select(m, el, done, review){
     const sel = new Set();
     const row = it => it.kind==='log'
       ? `<button class="pick log-row ${it.tag?'is-tag':''}" data-id="${it.id}" aria-pressed="false"><span class="t">${esc(it.time)}</span><span class="lr-where">${esc(it.text)}</span><span class="a">${esc(it.act)}</span>${it.tag?`<span class="lr-tag">${esc(it.tag)}</span>`:''}</button>`
@@ -1281,6 +1478,11 @@ const MODULES = {
         <div class="picks">${g.ids.map(id=>row(m.items.find(i=>i.id===id))).join('')}</div></div>`).join('')}
       <div class="row"><button class="btn-main" id="chk">${esc(m.goLabel||'탐정에게 보여 주기')}</button><span class="mod-note" id="cnt" style="margin:0">고른 증거 0 / ${m.answer.length}</span></div>`;
     const picks = el.querySelectorAll('.pick');
+    if (review){
+      picks.forEach(p => { p.disabled = true; if (m.answer.includes(p.dataset.id)) p.classList.add('on','right'); });
+      $('#chk', el).remove(); $('#cnt', el).textContent = `고른 증거 ${m.answer.length} / ${m.answer.length}`;
+      return;
+    }
     if (ANSWERS) picks.forEach(p => { if (m.answer.includes(p.dataset.id)) p.classList.add('ans'); });
     picks.forEach(p => p.onclick = () => {
       if (p.disabled) return;
@@ -1298,6 +1500,108 @@ const MODULES = {
       if (!wrong.length && !miss.length){ picks.forEach(p=>p.disabled=true); $('#chk', el).remove(); done(); }
       else if (wrong.length) say({ who:'det', face:'think', say: m.why[wrong[0]] || '그 증거는 아닌 것 같아.' }, 'no');
       else say({ who:'det', face:'point', say: `좋아, ${m.answer.length-miss.length}개는 맞아. 하나 더 찾아보자!` });
+    };
+  },
+
+  /* 순서 복원: 명령 카드를 차례대로 놓고 로봇에게 실행시키기 */
+  order(m, el, done, review){
+    /* 명령 고쳐 실행하기: 왼쪽 프로그램(빈 칸) · 오른쪽 블록 상자 → 실행하면 로봇 실행 화면 */
+    const n = m.answer.length;
+    const card = id => m.cards.find(c => c.id === id);
+    const st0 = Object.assign({}, m.init || {});
+    let placed = review ? m.answer.slice() : [], running = false, won = !!review, view = review ? 'run' : 'box';
+    el.innerHTML = `
+      <div class="ord2">
+        <div class="o2-prog">
+          <div class="o2-t">${esc(m.slotsTitle||'프로그램')}</div>
+          ${m.startText?`<div class="o2-start"><span class="blk start">${esc(m.startText)}</span></div>`:''}
+          <ol class="o2-slots" id="oSlots"></ol>
+          <div class="row" id="oBtns"><button class="btn-main" id="oRun">${esc(m.runLabel||'실행하기')} ▶</button><button class="btn-sub" id="oClr">모두 빼기</button></div>
+        </div>
+        <div class="o2-side" id="oSide"></div>
+      </div>`;
+    const slots = $('#oSlots', el), side = $('#oSide', el);
+    const blk = (c, extra='') => `<span class="blk ${c.kind||''}">${esc(c.text)}</span>${extra}`;
+    const drawSlots = (runAt=-1, bad=-1) => {
+      slots.innerHTML = Array.from({length:n}, (_,i) => {
+        const id = placed[i], cls = i===bad?'bad':(won||i<runAt)?'ok':i===runAt?'run':'';
+        return id
+          ? `<li><button class="o2-slot filled ${cls}" data-i="${i}" ${running||won?'disabled':''} title="눌러서 빼기"><i>${i+1}</i>${blk(card(id))}</button></li>`
+          : `<li><div class="o2-slot empty ${i===placed.length?'next':''}"><i>${i+1}</i><span>${i===placed.length?'여기에 끼워요':''}</span></div></li>`;
+      }).join('');
+      slots.querySelectorAll('.o2-slot.filled').forEach(b => b.onclick = () => {
+        if (running || won) return;
+        placed.splice(+b.dataset.i, 1); view = 'box'; draw();
+      });
+    };
+    const drawBox = () => {
+      side.innerHTML = `<div class="o2-t">${esc(m.cardsLabel||'명령 블록 · 눌러서 차례대로 끼우기')}</div>
+        <div class="o2-box">${m.cards.map(c => { const k = m.answer.indexOf(c.id);
+          return `<button class="o2-card ${ANSWERS&&k>=0?'ans':''}" data-id="${c.id}" ${placed.includes(c.id)?'disabled':''}>${ANSWERS&&k>=0?`<b class="ord-ans">${k+1}</b>`:''}${blk(c)}</button>`; }).join('')}</div>`;
+      side.querySelectorAll('.o2-card').forEach(b => b.onclick = () => {
+        if (running || won || placed.length >= n) return;
+        placed.push(b.dataset.id); draw();
+      });
+    };
+    const gauge = s => {
+      const t = Math.max(0, Math.min(100, s.temp ?? 20));
+      return `<div class="o2-state">
+        <div class="o2-g"><span>물</span><b>${esc(s.water||'없음')}</b></div>
+        <div class="o2-g"><span>물 온도</span><div class="o2-bar"><i style="width:${t}%;background:${t>=100?'var(--red)':t>=60?'#FF922B':'#74C0FC'}"></i></div><b>${t}℃</b></div>
+        <div class="o2-g"><span>인덕션</span><b class="${s.heat?'on':'off'}">${s.heat?'켜짐':'꺼짐'}</b></div>
+        <div class="o2-g"><span>면</span><b>${esc(s.noodle||'없음')}</b></div>
+      </div>`;
+    };
+    const drawRun = (s, log, result) => {
+      side.innerHTML = `<div class="o2-t">${esc(m.runTitle||'실행 화면')}</div>
+        <div class="o2-run">
+          <div class="o2-robot ${running?'busy':''}">${art(m.robotImg)}</div>
+          ${gauge(s)}
+        </div>
+        <div class="o2-log" aria-live="polite">${log||''}</div>
+        <div id="oRes">${result||''}</div>`;
+    };
+    const winHTML = () => `<div class="result ok ord-ok">${m.winImg?`<span class="ord-win">${art(m.winImg)}</span>`:''}<span>${esc(m.winText||'성공!')}</span></div>`;
+    const finalState = () => m.answer.reduce((s,id) => Object.assign(s, (card(id).run||{}).state), Object.assign({}, st0));
+    const draw = () => {
+      drawSlots();
+      $('#oBtns', el).style.display = won ? 'none' : '';
+      if (view === 'run' && won) drawRun(finalState(), esc(m.doneLog||'명령을 모두 실행했어.'), winHTML());
+      else drawBox();
+    };
+    draw();
+    if (review) return;
+    $('#oClr', el).onclick = () => { if (!running && !won){ placed = []; view = 'box'; draw(); } };
+    $('#oRun', el).onclick = () => {
+      if (running || won) return;
+      if (placed.length < n){ say({ who:'det', face:'think', say:`명령 블록 ${n}개를 모두 끼워 보자.` }); return; }
+      S.tries++; running = true; view = 'run';
+      const bad = placed.findIndex((id,i) => id !== m.answer[i]);
+      const s = Object.assign({}, st0);
+      let i = 0;
+      drawSlots(0); drawRun(s, '실행 준비 중...');
+      const step = () => {
+        if (i < n && (bad < 0 || i < bad)){
+          const c = card(placed[i]), r = c.run || {};
+          Object.assign(s, r.state || {});
+          drawSlots(i); drawRun(s, `<b>${i+1}번</b> ${esc(c.text)} → ${esc(r.say||'실행했어.')}`);
+          i++; setTimeout(step, 800); return;
+        }
+        running = false;
+        if (bad < 0){
+          won = true; drawSlots(); $('#oBtns', el).style.display = 'none';
+          drawRun(s, esc(m.doneLog||'명령을 모두 실행했어.'), winHTML());
+          done();
+        } else {
+          drawSlots(-1, bad);
+          drawRun(Object.assign(s, { noodle: m.failNoodle || '이상해' }), `<b>${bad+1}번</b> ${esc(card(placed[bad]).text)} → <em>${esc((m.fail||{})[placed[bad]] || '여기서 라면이 이상해졌어.')}</em>`,
+            `<div class="result no ord-ok">${m.failImg?`<span class="ord-win">${art(m.failImg)}</span>`:''}<span>${bad+1}번 명령에서 멈췄어. 블록을 빼고 다시 끼워 보자.</span></div><button class="btn-sub" id="oFix">명령 고치기</button>`);
+          $('#oFix', el).onclick = () => { view = 'box'; draw(); };
+          slots.querySelectorAll('.o2-slot.filled').forEach(b => b.disabled = false);
+          say(m.onMiss, 'no');
+        }
+      };
+      setTimeout(step, 500);
     };
   }
 };
