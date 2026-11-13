@@ -31,12 +31,16 @@ function art(key, cls){
 const S = {};
 function reset(fresh){
   if (fresh) clearSave();
-  Object.assign(S, { links:null, boardLinked:false, boardPos:null, stage:0, open:null, mod:0, modDone:{}, evidence:[], seen:0, hyp:{}, hints:0, tries:0, start:Date.now(), solved:false, line:null, reply:null });
+  Object.assign(S, { links:null, boardLinked:false, boardPos:null, stage:0, reviewFrom:null, open:null, mod:0, modDone:{}, evidence:[], seen:0, hyp:{}, hints:0, tries:0, start:Date.now(), solved:false, line:null, reply:null });
   CASE.hypotheses.forEach(h => S.hyp[h.id] = 'open');
   S.pointer = true;
   try { S.asst = +localStorage.getItem(ASST_KEY) || null; } catch(e){ S.asst = null; }
   const saved = fresh ? null : loadSave();
-  if (saved){ Object.assign(S, saved); S.links = new Set(saved.links || []); S.start = Date.now() - (saved.sec||0)*1000; }
+  if (saved){ Object.assign(S, saved); S.links = new Set(saved.links || []); S.start = Date.now() - (saved.sec||0)*1000;
+    /* 사건 데이터가 바뀌어 없어진 증거는 저장에서 빼기 */
+    S.evidence = (S.evidence || []).filter(id => CASE.evidence[id]);
+    S.links = new Set([...S.links].filter(id => CASE.evidence[id]));
+    if (!CASE.stages[S.stage]) S.stage = 0; }
   const begin = () => { if (saved) enterStage(); else if (CASE.opening){ S.cut = 0; renderOpening(); } else enterStage(); };
   if (CHARS && !S.asst) renderPicker(begin); else begin();
 }
@@ -44,7 +48,7 @@ function reset(fresh){
 /* ---------- 진행 저장 (정답 보기에서는 저장하지 않음) ---------- */
 function save(){
   if (ANSWERS || S.solved) return;
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ stage:S.stage, evidence:S.evidence, seen:S.evidence.length, hyp:S.hyp, modDone:S.modDone,
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ stage:(S.reviewFrom ?? S.stage), evidence:S.evidence, seen:S.evidence.length, hyp:S.hyp, modDone:S.modDone,
     links:[...(S.links||[])], boardLinked:S.boardLinked, boardPos:S.boardPos, hints:S.hints, tries:S.tries, sec:Math.round((Date.now()-S.start)/1000) })); } catch(e){}
 }
 function loadSave(){ if (ANSWERS) return null; try { return JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch(e){ return null; } }
@@ -109,12 +113,34 @@ function renderPicker(after){
 function stepsHTML(inOpening){
   const caseBtn = CASE.opening ? `<button class="st st-case ${inOpening?'now':''}" id="caseBtn" ${inOpening?'aria-current="step"':''}><i>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg></i>사건</button><span class="st-bar ${inOpening?'':'done'}"></span>` : '';
+  /* 지금 단계(cur)까지는 눌러서 이동: 지난 단계는 다시 보기, 지금 단계는 돌아가기 */
+  const cur = S.reviewFrom ?? S.stage, opReview = inOpening && S.review;
   return `<nav class="steps" aria-label="진행 단계">${caseBtn}${CASE.stages.map((s,k)=>{
-    const done = !inOpening && (k<S.stage||S.solved), now = !inOpening && k===S.stage && !S.solved;
-    return `${k?`<span class="st-bar ${!inOpening&&k<=S.stage?'done':''}"></span>`:''}<span class="st ${done?'done':now?'now':''}"><i>${done?'✓':k+1}</i>${esc(s.step)}</span>`;
+    const done = (!inOpening || opReview) && (k<cur||S.solved), now = !inOpening && k===cur && !S.solved;
+    const view = !inOpening && S.reviewFrom != null && k === S.stage;
+    const go = (!inOpening || opReview) && !S.solved && k <= cur && !(now && S.reviewFrom == null);
+    const inner = `<i>${done?'✓':k+1}</i>${esc(s.step)}`;
+    const cls = `st ${done?'done':''} ${now&&!view?'now':''} ${view?'view':''}`;
+    return `${k?`<span class="st-bar ${(!inOpening||opReview)&&k<=cur?'done':''}"></span>`:''}${go
+      ? `<button class="${cls} st-go" data-k="${k}" title="${k<cur?esc(s.step)+' 다시 보기':esc(s.step)+' 단계로 돌아가기'}" ${view?'aria-current="step"':''}>${inner}</button>`
+      : `<span class="${cls}" ${now?'aria-current="step"':''}>${inner}</span>`}`;
   }).join('')}</nav>`;
 }
+function bindStepBtns(){
+  document.querySelectorAll('.st-go').forEach(b => b.onclick = () => { S.inOpening = false; S.review = false; goStage(+b.dataset.k); });
+}
+/* 지난 단계 다시 보기 · 지금 단계로 돌아가기 */
+function goStage(k){
+  const cur = S.reviewFrom ?? S.stage;
+  if (k > cur) return;
+  S.open = null; S.mod = 0;
+  if (k === cur){ S.stage = cur; S.reviewFrom = null; enterStage(); return; }
+  S.reviewFrom = cur; S.stage = k;
+  S.line = { who:'det', face:'default', say: CASE.stages[k].step + ' 단계를 다시 보자.' }; S.reply = { face:'default', say:'' };
+  render();
+}
 function bindCaseBtn(){
+  bindStepBtns();
   const b = $('#caseBtn'); if (!b) return;
   b.onclick = () => { if (S.inOpening) return; S.review = true; S.cut = CASE.opening.panels.length-1; renderOpening(); };
 }
@@ -140,14 +166,18 @@ function renderOpening(){
   if ($('#back')) { $('#back').onclick = () => { S.inOpening = false; S.review = false; render(); }; $('#back').focus(); }
   if ($('#nextCut')) $('#nextCut').onclick = () => { S.cut++; renderOpening(); };
   if ($('#skip')) $('#skip').onclick = () => { S.cut = n-1; renderOpening(); };
-  bindTools();
+  bindTools(); bindStepBtns();
   if ($('#start')) { $('#start').onclick = go; $('#start').focus(); } else if ($('#nextCut')) $('#nextCut').focus();
 }
 function panelHTML(p, k){
   const bubbles = (p.lines||[]).map(l => `
     <div class="c-say ${l.who}"><div class="c-face">${art((l.who==='det'?'det.':'inv.')+(l.face||'default'))}</div><div class="c-bubble ${l.who==='det'?'tail-l':'inv tail-r'}">${esc(l.say)}</div></div>`).join('');
   let body = '';
-  if (p.kind === 'notify'){
+  if (p.kind === 'notify' && p.bg){
+    /* 장면 배경 위에 소품과 알림 */
+    body = `<div class="c-phone c-scene-wrap"><div class="c-scene">${art(p.bg)}</div><div class="c-scene-img">${art(p.img)}</div>${p.bgFront?`<div class="c-scene c-scene-front" style="clip-path:inset(${+p.bgFront}% 0 0 0)">${art(p.bg)}</div>`:''}${p.thing?`<div class="c-scene-thing">${art(p.thing)}</div>`:''}
+      <div class="c-noti c-robot-say tail-l"><small>${esc(p.app||'알림')}</small><b>${esc(p.head)}</b>${esc(p.body)}</div></div>`;
+  } else if (p.kind === 'notify'){
     body = `<div class="c-phone"><div class="c-phone-img">${art(p.img)}</div>
       <div class="c-noti"><small>${esc(p.app||'알림')} · ${esc(p.time||'방금')}</small><b>${esc(p.head)}</b>${esc(p.body)}</div></div>`;
   } else if (p.kind === 'photo'){
@@ -156,7 +186,7 @@ function panelHTML(p, k){
     /* 탐정·수사원이 크게 나와 대화하는 컷 */
     const [a,b] = p.lines||[];
     return `${p.caption?`<div class="c-cap">${esc(p.caption)}</div>`:''}
-      <div class="c-duo">
+      <div class="c-duo${p.bg?' has-bg':''}">${p.bg?`<div class="c-scene">${art(p.bg)}</div>`:''}
         <div class="c-big det">${art('det.'+((a&&a.face)||'default'))}</div>
         <div class="c-duo-talk">${a?`<div class="c-bubble tail-l">${esc(a.say)}</div>`:''}${b?`<div class="c-bubble inv tail-r">${esc(b.say)}</div>`:''}</div>
         <div class="c-big inv">${art('inv.'+((b&&b.face)||'default'))}</div>
@@ -242,6 +272,7 @@ function render(){
 
 /* 정답 보기: 이 단계를 정답으로 끝내고 다음으로 */
 function skipStage(){
+  if (S.reviewFrom != null){ goStage(S.reviewFrom); return; }
   const st = stage();
   if (S.solved) return;
   if (st.kind === 'desk'){
@@ -284,7 +315,7 @@ function renderNote(){
     <div class="theory ${S.hyp[h.id]}">
       <div class="th-top"><span class="th-t">탐정의 추리</span><span class="th-state">${HYP_LABEL[S.hyp[h.id]]}</span></div>
       <p class="th-text">${esc(h.text)}</p>
-      ${h.where?`<div class="th-where">확인할 곳 · ${esc(h.where)}</div>`:''}
+      ${h.where?`<div class="th-where">확인할 곳: ${esc(h.where)}</div>`:''}
     </div>`; })() : `<div class="hyps"><div class="hyps-t">용의 방법</div>${CASE.hypotheses.map(h=>`
       <div class="hyp ${S.hyp[h.id]}">${THEORY?'':`<b>${h.id}</b>`}<span>${esc(THEORY?h.text:h.short)}${h.where?`<small class="hyp-where">확인: ${esc(h.where)}</small>`:''}</span><em>${HYP_LABEL[S.hyp[h.id]]}</em></div>`).join('')}</div>`}`;
   S.seen = S.evidence.length;
@@ -295,6 +326,13 @@ function give(ids){ (ids||[]).forEach(id => { if (!S.evidence.includes(id)) S.ev
 function setHyp(m){ Object.assign(S.hyp, m||{}); renderNote(); save(); }
 function setMission(text, count){
   const m = $('#mission'); if (!m) return;
+  if (S.reviewFrom != null){
+    const back = CASE.stages[S.reviewFrom].step;
+    m.classList.add('review');
+    m.innerHTML = `<span class="mis-t">다시 보기 · ${esc(stage().step)} 단계에서 찾은 것</span><button class="mis-hint" id="backCur">${esc(back)} 단계로 돌아가기 ▶</button>`;
+    $('#backCur').onclick = () => goStage(S.reviewFrom);
+    return;
+  }
   m.innerHTML = `<span class="mis-t">할 일 · ${esc(text)}${count?` <b>${count}</b>`:''}</span>
     <button class="mis-hint" id="hintBtn" title="탐정에게 도움말 듣기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg>도움말</button>`;
   $('#hintBtn').onclick = giveHint;
@@ -323,14 +361,19 @@ function renderDesk(st){
       ${active?'':'tabindex="-1" aria-disabled="true"'} aria-label="${esc(CASE.assetLabels[p.img]||p.id)}">
       <div class="prop-box">${art(p.img)}</div>${tag?`<span class="prop-tag">${esc(tag)}</span>`:''}</button>`;
   }).join('') + `<div id="zoomArea"></div>`;
+  if (S.reviewFrom != null) el.querySelectorAll('.prop.done').forEach(b => {
+    const p = st.props.find(x => x.id === b.dataset.id); if (!p || !p.modules) return;
+    b.classList.add('revisit'); b.removeAttribute('tabindex'); b.removeAttribute('aria-disabled');
+    b.onclick = () => { S.open = b.dataset.id; S.mod = 0; openZoom(st); };
+  });
   el.querySelectorAll('.prop.active').forEach(b => b.onclick = () => { S.pointer = false; $('#hand')&&$('#hand').remove(); S.open = b.dataset.id; S.mod = 0; openZoom(st); });
   const first = el.querySelector('.prop.active');
-  if (S.pointer && first && !S.open){
+  if (S.pointer && first && !S.open && S.reviewFrom == null){
     el.insertAdjacentHTML('beforeend', `<div class="hand" id="hand" aria-hidden="true" style="left:${first.offsetLeft+first.offsetWidth-30}px;top:${first.offsetTop+first.offsetHeight-20}px">
       <svg width="54" height="54" viewBox="0 0 24 24" fill="#fff" stroke="#1F2A55" stroke-width="1.4" stroke-linejoin="round"><path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V10l.5-.1a1.5 1.5 0 0 1 2.9.6l.1.3a1.5 1.5 0 0 1 2.8.8V13a1.5 1.5 0 0 1 2.7.9V16a6 6 0 0 1-6 6h-1.8a6 6 0 0 1-4.6-2.2L4.6 15a1.6 1.6 0 0 1 2.4-2.1L9 15z"/></svg></div>`);
   }
   if (S.open) openZoom(st);
-  else { $('#zoomArea').innerHTML = `<div class="idle">${esc(st.idle)}</div>`; setMission(st.idle); }
+  else { $('#zoomArea').innerHTML = `<div class="idle">${S.reviewFrom != null ? '\'조사 끝\' 소품을 누르면 그때 찾은 것을 다시 볼 수 있어' : esc(st.idle)}</div>`; setMission(st.idle); }
 }
 
 function openZoom(st){
@@ -339,12 +382,16 @@ function openZoom(st){
   $('#zoomArea').innerHTML = `
     <section class="zoom ${p.frame||''}" aria-label="${esc(m.name)}">
       <div class="zoom-head">${p.frame==='laptop'?'<span class="win-dots" aria-hidden="true"><i></i><i></i><i></i></span>':''}<span class="jua">${esc(m.title || (CASE.assetLabels[p.img]||'').replace(/\[.*?\]\s*/,''))}</span></div>
-      ${p.modules.length>1?`<div class="zoom-steps">${p.modules.map((x,k)=>`${k?'<span class="zs-bar"></span>':''}<span class="zs ${k<S.mod?'done':k===S.mod?'now':''}"><i>${k<S.mod?'✓':k+1}</i>${esc(x.name.replace(/^[①②③④]\s*/,''))}</span>`).join('')}</div>`:''}
+      ${p.modules.length>1?`<div class="zoom-steps">${p.modules.map((x,k)=>{ const rv = S.reviewFrom != null, d = rv || k<S.mod;
+        const inner = `<i>${d?'✓':k+1}</i>${esc(x.name.replace(/^[①②③④]\s*/,''))}`;
+        return `${k?'<span class="zs-bar"></span>':''}${rv?`<button class="zs done ${k===S.mod?'now':''}" data-m="${k}">${inner}</button>`:`<span class="zs ${k<S.mod?'done':k===S.mod?'now':''}">${inner}</span>`}`; }).join('')}</div>`:''}
       <div class="zoom-body" id="zb"></div>
     </section>`;
   setMission(m.mission);
-  if (m.start){ clearTimeout(talkTimer); S.line = { ...m.start }; S.reply = { face: S.reply ? S.reply.face : 'default', say: '' }; renderTalk(); }
-  MODULES[m.type](m, $('#zb'), () => finishModule(st, p, m));
+  if (m.start && S.reviewFrom == null){ clearTimeout(talkTimer); S.line = { ...m.start }; S.reply = { face: S.reply ? S.reply.face : 'default', say: '' }; renderTalk(); }
+  const review = S.reviewFrom != null;
+  if (review) document.querySelectorAll('.zoom-steps button.zs').forEach(b => b.onclick = () => { S.mod = +b.dataset.m; openZoom(st); });
+  MODULES[m.type](m, $('#zb'), review ? () => {} : () => finishModule(st, p, m), review);
 }
 
 function finishModule(st, p, m){
@@ -390,6 +437,15 @@ const MODULES = {
           <div class="code">${m.code.map(l=>`<div class="cl" style="padding-left:${(l.indent||0)*28+12}px"><span class="blk ${l.kind||''}">${tok(l.text)}</span></div>`).join('')}</div>
           ${m.output?`<div class="out"><div class="out-t">실행 결과</div>${m.output.img?`<div class="out-img">${art(m.output.img)}</div>`:''}<p>${tok(m.output.text)}</p></div>`:''}
         </div>`;
+      /* 실행 추적(trace)이 있으면: 명령 | 로봇이 한 일 표 + 아래 실행 결과 띠 */
+      if (m.code.some(l => l.trace)){
+        el.innerHTML = `
+          <div class="trace">
+            <div class="tr-h"><span>${esc(m.codeTitle||'명령')}</span><span>${esc(m.traceTitle||'로봇이 한 일')}</span></div>
+            ${m.code.map(l=>`<div class="tr-row"><div class="cl" style="padding-left:${(l.indent||0)*24+8}px"><span class="blk ${l.kind||''}">${tok(l.text)}</span></div><div class="tr-do">${l.trace?esc(l.trace):''}</div></div>`).join('')}
+          </div>
+          ${m.output?`<div class="out out-strip">${m.output.img?`<div class="out-img">${art(m.output.img)}</div>`:''}<div><div class="out-t">실행 결과</div><p>${tok(m.output.text)}</p></div></div>`:''}`;
+      }
     } else {
       el.innerHTML = `
         <div class="post-top"><span class="avatar"></span><div><div class="post-id">${esc(m.post.author)}</div><div class="post-sub">${esc(m.post.sub)}</div></div></div>
@@ -461,7 +517,7 @@ const MODULES = {
   },
 
   /* 증거 고르기: 기록·진술에서 정답 묶음 고르기 */
-  select(m, el, done){
+  select(m, el, done, review){
     const sel = new Set();
     const row = it => it.kind==='log'
       ? `<button class="pick log-row ${it.tag?'is-tag':''}" data-id="${it.id}" aria-pressed="false"><span class="t">${esc(it.time)}</span><span class="lr-where">${esc(it.text)}</span><span class="a">${esc(it.act)}</span>${it.tag?`<span class="lr-tag">${esc(it.tag)}</span>`:''}</button>`
@@ -475,6 +531,11 @@ const MODULES = {
         <div class="picks">${g.ids.map(id=>row(m.items.find(i=>i.id===id))).join('')}</div></div>`).join('')}
       <div class="row"><button class="btn-main" id="chk">${esc(m.goLabel||'탐정에게 보여 주기')}</button><span class="mod-note" id="cnt" style="margin:0">고른 증거 0 / ${m.answer.length}</span></div>`;
     const picks = el.querySelectorAll('.pick');
+    if (review){
+      picks.forEach(p => { p.disabled = true; if (m.answer.includes(p.dataset.id)) p.classList.add('on','right'); });
+      $('#chk', el).remove(); $('#cnt', el).textContent = `고른 증거 ${m.answer.length} / ${m.answer.length}`;
+      return;
+    }
     if (ANSWERS) picks.forEach(p => { if (m.answer.includes(p.dataset.id)) p.classList.add('ans'); });
     picks.forEach(p => p.onclick = () => {
       if (p.disabled) return;
@@ -492,6 +553,108 @@ const MODULES = {
       if (!wrong.length && !miss.length){ picks.forEach(p=>p.disabled=true); $('#chk', el).remove(); done(); }
       else if (wrong.length) say({ who:'det', face:'think', say: m.why[wrong[0]] || '그 증거는 아닌 것 같아.' }, 'no');
       else say({ who:'det', face:'point', say: `좋아, ${m.answer.length-miss.length}개는 맞아. 하나 더 찾아보자!` });
+    };
+  },
+
+  /* 순서 복원: 명령 카드를 차례대로 놓고 로봇에게 실행시키기 */
+  order(m, el, done, review){
+    /* 명령 고쳐 실행하기: 왼쪽 프로그램(빈 칸) · 오른쪽 블록 상자 → 실행하면 로봇 실행 화면 */
+    const n = m.answer.length;
+    const card = id => m.cards.find(c => c.id === id);
+    const st0 = Object.assign({}, m.init || {});
+    let placed = review ? m.answer.slice() : [], running = false, won = !!review, view = review ? 'run' : 'box';
+    el.innerHTML = `
+      <div class="ord2">
+        <div class="o2-prog">
+          <div class="o2-t">${esc(m.slotsTitle||'프로그램')}</div>
+          ${m.startText?`<div class="o2-start"><span class="blk start">${esc(m.startText)}</span></div>`:''}
+          <ol class="o2-slots" id="oSlots"></ol>
+          <div class="row" id="oBtns"><button class="btn-main" id="oRun">${esc(m.runLabel||'실행하기')} ▶</button><button class="btn-sub" id="oClr">모두 빼기</button></div>
+        </div>
+        <div class="o2-side" id="oSide"></div>
+      </div>`;
+    const slots = $('#oSlots', el), side = $('#oSide', el);
+    const blk = (c, extra='') => `<span class="blk ${c.kind||''}">${esc(c.text)}</span>${extra}`;
+    const drawSlots = (runAt=-1, bad=-1) => {
+      slots.innerHTML = Array.from({length:n}, (_,i) => {
+        const id = placed[i], cls = i===bad?'bad':(won||i<runAt)?'ok':i===runAt?'run':'';
+        return id
+          ? `<li><button class="o2-slot filled ${cls}" data-i="${i}" ${running||won?'disabled':''} title="눌러서 빼기"><i>${i+1}</i>${blk(card(id))}</button></li>`
+          : `<li><div class="o2-slot empty ${i===placed.length?'next':''}"><i>${i+1}</i><span>${i===placed.length?'여기에 끼워요':''}</span></div></li>`;
+      }).join('');
+      slots.querySelectorAll('.o2-slot.filled').forEach(b => b.onclick = () => {
+        if (running || won) return;
+        placed.splice(+b.dataset.i, 1); view = 'box'; draw();
+      });
+    };
+    const drawBox = () => {
+      side.innerHTML = `<div class="o2-t">${esc(m.cardsLabel||'명령 블록 · 눌러서 차례대로 끼우기')}</div>
+        <div class="o2-box">${m.cards.map(c => { const k = m.answer.indexOf(c.id);
+          return `<button class="o2-card ${ANSWERS&&k>=0?'ans':''}" data-id="${c.id}" ${placed.includes(c.id)?'disabled':''}>${ANSWERS&&k>=0?`<b class="ord-ans">${k+1}</b>`:''}${blk(c)}</button>`; }).join('')}</div>`;
+      side.querySelectorAll('.o2-card').forEach(b => b.onclick = () => {
+        if (running || won || placed.length >= n) return;
+        placed.push(b.dataset.id); draw();
+      });
+    };
+    const gauge = s => {
+      const t = Math.max(0, Math.min(100, s.temp ?? 20));
+      return `<div class="o2-state">
+        <div class="o2-g"><span>물</span><b>${esc(s.water||'없음')}</b></div>
+        <div class="o2-g"><span>물 온도</span><div class="o2-bar"><i style="width:${t}%;background:${t>=100?'var(--red)':t>=60?'#FF922B':'#74C0FC'}"></i></div><b>${t}℃</b></div>
+        <div class="o2-g"><span>인덕션</span><b class="${s.heat?'on':'off'}">${s.heat?'켜짐':'꺼짐'}</b></div>
+        <div class="o2-g"><span>면</span><b>${esc(s.noodle||'없음')}</b></div>
+      </div>`;
+    };
+    const drawRun = (s, log, result) => {
+      side.innerHTML = `<div class="o2-t">${esc(m.runTitle||'실행 화면')}</div>
+        <div class="o2-run">
+          <div class="o2-robot ${running?'busy':''}">${art(m.robotImg)}</div>
+          ${gauge(s)}
+        </div>
+        <div class="o2-log" aria-live="polite">${log||''}</div>
+        <div id="oRes">${result||''}</div>`;
+    };
+    const winHTML = () => `<div class="result ok ord-ok">${m.winImg?`<span class="ord-win">${art(m.winImg)}</span>`:''}<span>${esc(m.winText||'성공!')}</span></div>`;
+    const finalState = () => m.answer.reduce((s,id) => Object.assign(s, (card(id).run||{}).state), Object.assign({}, st0));
+    const draw = () => {
+      drawSlots();
+      $('#oBtns', el).style.display = won ? 'none' : '';
+      if (view === 'run' && won) drawRun(finalState(), esc(m.doneLog||'명령을 모두 실행했어.'), winHTML());
+      else drawBox();
+    };
+    draw();
+    if (review) return;
+    $('#oClr', el).onclick = () => { if (!running && !won){ placed = []; view = 'box'; draw(); } };
+    $('#oRun', el).onclick = () => {
+      if (running || won) return;
+      if (placed.length < n){ say({ who:'det', face:'think', say:`명령 블록 ${n}개를 모두 끼워 보자.` }); return; }
+      S.tries++; running = true; view = 'run';
+      const bad = placed.findIndex((id,i) => id !== m.answer[i]);
+      const s = Object.assign({}, st0);
+      let i = 0;
+      drawSlots(0); drawRun(s, '실행 준비 중...');
+      const step = () => {
+        if (i < n && (bad < 0 || i < bad)){
+          const c = card(placed[i]), r = c.run || {};
+          Object.assign(s, r.state || {});
+          drawSlots(i); drawRun(s, `<b>${i+1}번</b> ${esc(c.text)} → ${esc(r.say||'실행했어.')}`);
+          i++; setTimeout(step, 800); return;
+        }
+        running = false;
+        if (bad < 0){
+          won = true; drawSlots(); $('#oBtns', el).style.display = 'none';
+          drawRun(s, esc(m.doneLog||'명령을 모두 실행했어.'), winHTML());
+          done();
+        } else {
+          drawSlots(-1, bad);
+          drawRun(Object.assign(s, { noodle: m.failNoodle || '이상해' }), `<b>${bad+1}번</b> ${esc(card(placed[bad]).text)} → <em>${esc((m.fail||{})[placed[bad]] || '여기서 라면이 이상해졌어.')}</em>`,
+            `<div class="result no ord-ok">${m.failImg?`<span class="ord-win">${art(m.failImg)}</span>`:''}<span>${bad+1}번 명령에서 멈췄어. 블록을 빼고 다시 끼워 보자.</span></div><button class="btn-sub" id="oFix">명령 고치기</button>`);
+          $('#oFix', el).onclick = () => { view = 'box'; draw(); };
+          slots.querySelectorAll('.o2-slot.filled').forEach(b => b.disabled = false);
+          say(m.onMiss, 'no');
+        }
+      };
+      setTimeout(step, 500);
     };
   }
 };
