@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import TypeCover from '@/components/TypeCover';
-import type { TypeKey } from '@/lib/types';
 import StudentHeroArt from '@/components/StudentHeroArt';
+import StudentRecentCard from '@/components/StudentRecentCard';
+import type { Worksheet } from '@/types/worksheet';
+import { gradeBlock } from '../result/ResultBlockView';
 import {
   DEMO_CURRENT_ACTIVITY,
   DEMO_ALL_DONE,
@@ -13,16 +14,10 @@ import {
   initDemoViewedFeedbacks,
   getStudentActivities,
   type StudentActivity,
-  type WorksheetType,
 } from '@/lib/studentDemoData';
 
 const PURPLE = '#6741d9';
 const LS_INFO = 'activity_studio_student_info';
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
-}
 
 function IconChat() {
   return (
@@ -60,21 +55,6 @@ function IconChevron() {
   );
 }
 
-function StatusBadge({ status }: { status: StudentActivity['status'] }) {
-  const base: React.CSSProperties = {
-    fontSize: 12, fontWeight: 800,
-    padding: '4px 9px', borderRadius: 7,
-    display: 'inline-flex', alignItems: 'center',
-  };
-  if (status === 'feedback') {
-    return <span style={{ ...base, background: '#ffd43b', color: '#131c33' }}>피드백 도착</span>;
-  }
-  if (status === 'resubmit') {
-    return <span style={{ ...base, fontWeight: 700, background: '#f3f0ff', color: PURPLE }}>다시 풀기</span>;
-  }
-  return <span style={{ ...base, fontWeight: 700, background: '#eef1f6', color: '#5d6880' }}>확인 완료</span>;
-}
-
 function TypeChip({ type, size = 'sm' }: { type: string; size?: 'sm' | 'md' }) {
   const chip = TYPE_CHIP[type] ?? { bg: '#f0f0f0', text: '#5d6880', dot: '#5d6880' };
   const isMd = size === 'md';
@@ -96,7 +76,7 @@ function TypeChip({ type, size = 'sm' }: { type: string; size?: 'sm' | 'md' }) {
   );
 }
 
-export default function StudentHomeClient({ code }: { code: string }) {
+export default function StudentHomeClient({ code, sheet }: { code: string; sheet: Worksheet | null }) {
   const [name, setName] = useState('');
   const [doneItems, setDoneItems] = useState<StudentActivity[]>(DEMO_ALL_DONE);
   const [mounted, setMounted] = useState(false);
@@ -130,10 +110,23 @@ export default function StudentHomeClient({ code }: { code: string }) {
   );
   const hasTodos = feedbackItems.length > 0 || resubmitItems.length > 0;
 
-  const recentCards = doneItems
-    .filter(s => s.worksheetId !== DEMO_CURRENT_ACTIVITY.worksheetId)
+  // 제출한 '지금 수업'의 맞힌 문항 수 (결과 상세와 같은 채점)
+  const score = (() => {
+    const blocks = (sheet?.sections.flatMap(sec => sec.blocks) ?? []).filter(b => b.kind !== 'note');
+    let answers: Record<string, unknown> = {};
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(`activity_studio_answers_${code}_${DEMO_CURRENT_ACTIVITY.worksheetId}`);
+        if (raw) answers = JSON.parse(raw);
+      } catch {}
+    }
+    const correct = blocks.filter(b => gradeBlock(b, answers[b.id]) === 'correct').length;
+    return { correct, total: blocks.length || DEMO_CURRENT_ACTIVITY.totalQuestions };
+  })();
+
+  const recentCards = [...doneItems]
     .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt))
-    .slice(0, 3);
+    .slice(0, 4);
 
   return (
     <div className="p-main">
@@ -195,26 +188,23 @@ export default function StudentHomeClient({ code }: { code: string }) {
                   <>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, color: '#5d6880', marginBottom: 8 }}>
-                        {currentSub.status === 'feedback' ? '피드백이 도착했어요' :
-                         currentSub.status === 'resubmit' ? '다시 풀어 주세요' : '제출 완료'}
+                        맞힌 문항 <b style={{ color: '#172036' }}>{score.correct}/{score.total}</b>
                       </div>
                       <div style={{ height: 8, background: '#eef0f5', borderRadius: 4, overflow: 'hidden' }}>
-                        <div style={{ width: '100%', height: '100%', background: PURPLE, borderRadius: 4 }} />
+                        <div style={{ width: `${Math.round(score.correct / score.total * 100)}%`, height: '100%', background: PURPLE, borderRadius: 4 }} />
                       </div>
                     </div>
                     <Link
                       href={`/s/${code}/result?id=${DEMO_CURRENT_ACTIVITY.worksheetId}`}
                       style={{
                         height: 48, padding: '0 22px', borderRadius: 12,
-                        background: currentSub.status !== 'done' ? PURPLE : '#fff',
-                        color: currentSub.status !== 'done' ? '#fff' : '#172036',
-                        border: currentSub.status !== 'done' ? 'none' : '1px solid #e3e7ef',
+                        background: PURPLE, color: '#fff',
                         textDecoration: 'none', fontSize: 16, fontWeight: 700,
                         display: 'inline-flex', alignItems: 'center', flexShrink: 0,
                         letterSpacing: '-.01em',
                       }}
                     >
-                      결과 보기
+                      이어서 보기
                     </Link>
                   </>
                 )}
@@ -342,59 +332,9 @@ export default function StudentHomeClient({ code }: { code: string }) {
               아직 끝낸 활동이 없어요.
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
               {recentCards.map(item => (
-                <div
-                  key={item.worksheetId}
-                  style={{
-                    border: '1px solid var(--line)', borderRadius: 16,
-                    overflow: 'hidden', display: 'flex', flexDirection: 'column',
-                    background: '#fff',
-                  }}
-                >
-                  <TypeCover type={item.type as TypeKey} height={88} />
-
-                  <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                      <TypeChip type={item.type} />
-                      <StatusBadge status={item.status} />
-                    </div>
-                    <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'var(--ink)', letterSpacing: '-.01em', lineHeight: 1.35 }}>
-                      {item.title}
-                    </p>
-                    <p style={{ margin: 0, fontSize: 13, color: '#5d6880' }}>
-                      {formatDate(item.submittedAt)} 제출 · {item.resultText}
-                    </p>
-                    <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-                      <Link
-                        href={`/s/${code}/result?id=${item.worksheetId}`}
-                        style={{
-                          flex: 1, height: 44, borderRadius: 10,
-                          background: item.status === 'feedback' ? PURPLE : '#fff',
-                          color: item.status === 'feedback' ? '#fff' : '#172036',
-                          border: item.status === 'feedback' ? 'none' : '1px solid #e3e7ef',
-                          textDecoration: 'none', fontSize: 15, fontWeight: 700,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}
-                      >
-                        결과 보기
-                      </Link>
-                      {item.status === 'resubmit' && (
-                        <Link
-                          href={`/s/${code}/activity`}
-                          style={{
-                            flex: 1, height: 44, borderRadius: 10,
-                            background: PURPLE, color: '#fff',
-                            textDecoration: 'none', fontSize: 15, fontWeight: 700,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}
-                        >
-                          다시 풀기
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <StudentRecentCard key={item.worksheetId} code={code} item={item} />
               ))}
             </div>
           )}
