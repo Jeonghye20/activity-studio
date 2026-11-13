@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import TypeThumbnail from '@/components/TypeThumbnail';
 import type { Worksheet, Block } from '@/types/worksheet';
 import {
   DEMO_RESULT_MAP,
@@ -12,6 +11,9 @@ import {
   type QuestionResult,
   type ResultData,
 } from '@/lib/studentDemoData';
+import { DEMO_ANSWERS } from '@/lib/studentDemoAnswers';
+import ResultBlockView, { gradeBlock, DRAWABLE_KINDS, ResultPreparingNotice } from './ResultBlockView';
+import ResultHero from './ResultHero';
 
 const PURPLE = '#6741d9';
 const NAVY = '#131c33';
@@ -196,6 +198,7 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
   const [wsType, setWsType] = useState<string>('concept');
   const [isNew, setIsNew] = useState(false);
   const [tab, setTab] = useState<'all' | 'review'>('all');
+  const [viewAnswers, setViewAnswers] = useState<Answers>({});
 
   const VIEWED_KEY = `activity_studio_result_viewed_${code}`;
 
@@ -240,7 +243,17 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
 
     // 문항 결과
     if (sheet) {
-      const qs = buildQuestionsFromSheet(sheet, storedAnswers, demo);
+      // 실제 제출이 있으면 실제 답만, 없으면 시연용 예시 답
+      const answers: Answers = storedSub ? storedAnswers : (DEMO_ANSWERS[worksheetId] ?? storedAnswers);
+      setViewAnswers(answers);
+      const blockMap = new Map(sheet.sections.flatMap(sec => sec.blocks).map(b => [b.id, b]));
+      const qs = buildQuestionsFromSheet(sheet, answers, storedSub ? null : demo).map(q => {
+        const b = blockMap.get(q.blockId);
+        const g = b ? gradeBlock(b, answers[q.blockId]) : null;
+        if (g) return { ...q, status: g };
+        // 실제 제출인데 답을 안 낸 문항은 '다시 볼 것'
+        return storedSub ? { ...q, status: 'review' as const } : q;
+      });
       setQuestions(qs);
       const correct = qs.filter(q => q.status === 'correct').length;
       setCorrectCount(correct);
@@ -258,9 +271,9 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
 
     // 메타
     const wsTitle = sheet?.title ?? demo?.title ?? '활동지';
-    const wsMeta = demo?.meta ?? (storedSub
+    const wsMeta = storedSub
       ? `정보 · ${formatDate(storedSub.submittedAt)} 제출 · 김선생님`
-      : '');
+      : (demo?.meta ?? '');
     setTitle(wsTitle);
     setMeta(wsMeta);
     setWsType(sheet?.type ?? demo?.type ?? 'concept');
@@ -300,48 +313,26 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
   const filteredQs = tab === 'all' ? questions : questions.filter(q => q.status === 'review');
 
   // ─── Hero band ──────────────────────────────────────────────────────────
+  const submittedText = meta.match(/\d+월 \d+일 제출/)?.[0] ?? '';
   const heroBand = (
-    <div className="hero" style={{ padding: '24px 28px', marginBottom: 18 }}>
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-        {/* 썸네일 */}
-        <div style={{ width: 160, height: 112, borderRadius: 12, overflow: 'hidden', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }}>
-          <TypeThumbnail type={wsType as Parameters<typeof TypeThumbnail>[0]['type']} height={112} />
-        </div>
-
-        {/* 정보 */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 7 }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: typeColor, flexShrink: 0 }} />
-              {typeLabel}
-            </span>
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{meta}</span>
-          </div>
-          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 850, color: '#fff', letterSpacing: '-.02em', lineHeight: 1.3 }}>
-            {title}
-          </h1>
-        </div>
-
-        {/* 결과 상자 */}
-        <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: '16px 22px', textAlign: 'center', flexShrink: 0 }}>
-          {isGameType && gameResult ? (
-            <>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(255,255,255,0.65)', marginBottom: 5 }}>결과</div>
-              <div style={{ fontSize: 22, fontWeight: 850, color: '#ffd43b', lineHeight: 1 }}>{gameResult}</div>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(255,255,255,0.65)', marginBottom: 5 }}>맞힌 문항</div>
-              <div style={{ lineHeight: 1 }}>
-                <span style={{ fontSize: 34, fontWeight: 850, color: '#fff' }}>{correctCount}</span>
-                <span style={{ fontSize: 20, color: 'rgba(255,255,255,0.55)', fontWeight: 700 }}> / {totalCount}</span>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    <ResultHero
+      worksheetId={worksheetId}
+      type={wsType}
+      typeLabel={typeLabel}
+      typeColor={typeColor}
+      title={title}
+      unit={sheet?.unit}
+      minutes={sheet?.minutes}
+      goal={sheet?.goal}
+      submittedText={submittedText}
+      result={isGameType && gameResult
+        ? { kind: 'game', text: gameResult }
+        : { kind: 'score', correct: correctCount, total: totalCount }}
+    />
   );
+
+  // 교사 화면 모양으로 아직 못 그리는 문항이 있으면 '수정 중' 안내
+  const preparing = !!sheet && sheet.sections.flatMap(sec => sec.blocks).some(bl => !DRAWABLE_KINDS.includes(bl.kind));
 
   // ─── 피드백 카드 ─────────────────────────────────────────────────────────
   const feedbackCard = (
@@ -465,6 +456,17 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
   );
 
   // ─── 문항별 결과 ─────────────────────────────────────────────────────────
+  const preparingSection = (
+    <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 24, overflow: 'hidden', marginBottom: 18 }}>
+      <div style={{ padding: '18px 24px 16px', borderBottom: '1px solid var(--line)' }}>
+        <span style={{ fontSize: 17, fontWeight: 850, color: 'var(--ink)', letterSpacing: '-.01em' }}>문항별 결과</span>
+      </div>
+      <div style={{ padding: '20px 24px 24px' }}>
+        <ResultPreparingNotice />
+      </div>
+    </div>
+  );
+
   const questionSection = questions.length > 0 && (
     <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 24, overflow: 'hidden', marginBottom: 18 }}>
       {/* 헤더 */}
@@ -522,6 +524,22 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
             해당하는 문항이 없어요.
           </div>
         ) : filteredQs.map(q => {
+          const block = sheet?.sections.flatMap(sec => sec.blocks).find(bl => bl.id === q.blockId);
+          if (block) {
+            return (
+              <ResultBlockView
+                key={q.blockId}
+                block={block}
+                num={q.num}
+                ans={viewAnswers[q.blockId]}
+                status={q.status}
+                fallbackText={q.studentAnswer}
+                showAnswer={!resubmitData}
+                comment={q.teacherComment}
+                commentIcon={<IconChat />}
+              />
+            );
+          }
           const isReview = q.status === 'review';
           return (
             <div
@@ -533,7 +551,6 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
                 padding: '16px 18px',
               }}
             >
-              {/* 문항 헤더: 번호 + 프롬프트 + 태그 */}
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 12 }}>
                 <QNumCircle n={q.num} status={q.status} />
                 <p style={{ margin: '4px 0 0', fontSize: 15, fontWeight: 600, color: 'var(--ink)', flex: 1, lineHeight: 1.6, minWidth: 0 }}>
@@ -541,23 +558,12 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
                 </p>
                 <StatusTag status={q.status} />
               </div>
-
-              {/* 내 답 */}
-              <div style={{
-                background: '#f8f9fb', borderRadius: 8,
-                padding: '10px 14px',
-                marginBottom: q.teacherComment ? 10 : 0,
-              }}>
+              <div style={{ background: '#f8f9fb', borderRadius: 8, padding: '10px 14px', marginBottom: q.teacherComment ? 10 : 0 }}>
                 <span style={{ fontSize: 11.5, fontWeight: 700, color: '#9ca3af', marginRight: 10 }}>내 답</span>
                 <span style={{ fontSize: 14, color: 'var(--ink)', whiteSpace: 'pre-wrap' }}>{q.studentAnswer}</span>
               </div>
-
-              {/* 선생님 문항 코멘트 */}
               {q.teacherComment && (
-                <div style={{
-                  display: 'flex', gap: 8, alignItems: 'flex-start',
-                  padding: '10px 12px', background: '#fff4e6', borderRadius: 8,
-                }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '10px 12px', background: '#fff4e6', borderRadius: 8 }}>
                   <span style={{ color: ORANGE, flexShrink: 0, marginTop: 1 }}><IconChat /></span>
                   <div>
                     <span style={{ fontSize: 11.5, fontWeight: 700, color: ORANGE, marginRight: 8 }}>선생님</span>
@@ -625,7 +631,7 @@ export default function ResultClient({ code, worksheetId, sheet }: Props) {
       {heroBand}
       {feedbackCard}
       {resubmitCard}
-      {questionSection}
+      {preparing ? preparingSection : questionSection}
       {bottomBar}
     </div>
   );
