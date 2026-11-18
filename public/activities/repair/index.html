@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장치 수리 센터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="repair.css">
+<style>
+  html,body{margin:0;background:#f4f6f8}
+  .rp-page{max-width:1040px;margin:0 auto;padding:22px 16px 40px}
+  /* 끼웠을 때: 바탕 투명, 여백 최소 */
+  html.embedded,html.embedded body{background:transparent}
+  html.embedded .rp-page{padding:4px}
+</style>
+</head>
+<body>
+  <div class="rp-page"><div id="app"></div></div>
+
+  <script src="content.js"></script>
+  <script src="repair.js"></script>
+  <script>
+    var embedded = window.parent && window.parent !== window;
+    function toParent(msg){ if (embedded) window.parent.postMessage(msg, "*"); }
+    if (embedded) document.documentElement.classList.add("embedded");
+
+    // 처음 열 때만 정답 보기를 켠 채로 시작 (?answers=1). 그 뒤 켜고 끄기는 메시지로만.
+    var startAnswers = new URLSearchParams(location.search).get("answers") === "1";
+
+    var inst = RepairCenter.mount(document.getElementById("app"), {
+      content: window.REPAIR_CONTENT,
+      answers: startAnswers,
+      onChange: function (state) {
+        toParent({ source: "repair-engine", type: "state", requests: state.requests, fixedCount: state.fixedCount, allDone: state.allDone });
+        reportHeight();
+      },
+      onSolved: function () {
+        toParent({ source: "repair-engine", type: "solved" });
+      },
+    });
+
+    // 바깥 → 모듈: 정답 보기 토글(재로딩 없음, 상태 유지) / 처음부터 다시
+    window.addEventListener("message", function (e) {
+      var d = e.data || {};
+      if (d.type === "repair:answers") inst.setAnswers(!!d.on);
+      else if (d.type === "repair:reset") inst.reset();
+      else if (d.type === "repair:get" && e.source) e.source.postMessage({ source: "repair-engine", type: "state", state: inst.getState() }, "*");
+    });
+
+    // 끼운 자리 높이 맞춤
+    function reportHeight(){
+      if (!embedded) return;
+      var el = document.querySelector(".rp-page");
+      toParent({ source: "repair-engine", type: "height", height: Math.ceil(el.getBoundingClientRect().height) });
+    }
+    if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.querySelector(".rp-page"));
+    window.addEventListener("load", reportHeight);
+    toParent({ source: "repair-engine", type: "ready", state: inst.getState() });
+    reportHeight();
+  </script>
+</body>
+</html>
