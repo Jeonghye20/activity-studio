@@ -40,6 +40,7 @@ export interface Worksheet {
   story?: string;
   lock?: Record<string, unknown>;
   heroArt?: number;
+  heroImg?: string;
   sections: Section[];
 }
 
@@ -52,6 +53,7 @@ export interface WorksheetSummary {
   goal: string;
   keywords: string[];
   situations: Situation[];
+  heroImg?: string;
 }
 
 export interface CurriculumUnit {

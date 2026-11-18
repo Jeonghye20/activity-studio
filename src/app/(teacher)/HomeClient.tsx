@@ -174,7 +174,11 @@ function WsCard({ sheet, unitTitle, isNew, isPreparing }: { sheet: WorksheetSumm
         </div>
       )}
       <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0 }}>
-        <TypeCover type={sheet.type as TypeKey} height={120} block={false} />
+        {sheet.heroImg ? (
+          <img src={sheet.heroImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        ) : (
+          <TypeCover type={sheet.type as TypeKey} height={120} block={false} />
+        )}
       </div>
       <div className="body">
         <div className="row">
