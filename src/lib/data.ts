@@ -12,8 +12,8 @@ export function getAllWorksheets(): WorksheetSummary[] {
   const sheets: Worksheet[] = JSON.parse(
     readFileSync(path.join(DATA_DIR, 'worksheets.json'), 'utf8')
   );
-  return sheets.map(({ id, unit, title, type, minutes, goal, keywords, situations, heroImg }) => ({
-    id, unit, title, type, minutes, goal, keywords, situations, heroImg,
+  return sheets.map(({ id, unit, title, type, minutes, goal, keywords, situations, heroImg, heroFit }) => ({
+    id, unit, title, type, minutes, goal, keywords, situations, heroImg, heroFit,
   }));
 }
 

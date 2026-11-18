@@ -41,6 +41,7 @@ export interface Worksheet {
   lock?: Record<string, unknown>;
   heroArt?: number;
   heroImg?: string;
+  heroFit?: string;
   sections: Section[];
 }
 
@@ -54,6 +55,7 @@ export interface WorksheetSummary {
   keywords: string[];
   situations: Situation[];
   heroImg?: string;
+  heroFit?: string;
 }
 
 export interface CurriculumUnit {
