@@ -37,8 +37,20 @@ export default function PreviewClient({ sheet, units }: Props) {
     (s.blocks as Record<string, unknown>[]).some(isGradedBlock)
   );
 
+  // 정답 보기를 지원하는 끼운 활동(answers:true embed, 예: 수리 센터)
+  const embedAnswers = sheet.sections.some(s =>
+    (s.blocks as Record<string, unknown>[]).some(b => b.kind === 'embed' && b.answers === true)
+  );
+
+  // 정답 보기를 켜고 끌 때 끼운 모듈에 메시지로 전달(재로딩 없음, 풀던 상태 유지)
+  useEffect(() => {
+    if (!embedAnswers) return;
+    const iframe = document.querySelector('.pv-paper iframe') as HTMLIFrameElement | null;
+    iframe?.contentWindow?.postMessage({ type: 'repair:answers', on: showAnswers }, '*');
+  }, [showAnswers, embedAnswers]);
+
   function renderAnswerSwitch() {
-    if (!hasGraded) {
+    if (!hasGraded && !embedAnswers) {
       return (
         <span style={{ position: 'relative', display: 'block', marginTop: 4 }}>
           <button
@@ -242,9 +254,9 @@ export default function PreviewClient({ sheet, units }: Props) {
             </div>
           </div>
 
-          {/* 본문: 활동지 */}
+          {/* 본문: 활동지. 끼운 모듈이 정답 보기를 맡는 경우 ws.js 를 다시 그리지 않게 showAnswers 고정 */}
           <div className="pv-paper">
-            <WorksheetViewer sheet={sheet} showAnswers={showAnswers} units={units} hideMeta />
+            <WorksheetViewer sheet={sheet} showAnswers={embedAnswers ? false : showAnswers} units={units} hideMeta />
           </div>
         </>
       )}

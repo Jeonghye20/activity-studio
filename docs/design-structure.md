@@ -10,7 +10,7 @@
 | 개념 확인 (concept) | 빛나는 전구 |
 | 탈출 게임 (escape) | 자물쇠 |
 | 추리 게임 (mystery) | 물음표 돋보기 |
-| 실습 기록 (practice) | 코드 창 `</>` |
+| 코드 탐구 (practice) | 코드 창 `</>` |
 | 자료 분석 (analysis) | 막대그래프 + 꺾은선 |
 | 토론·의견 (discussion) | 말풍선 두 개 |
 

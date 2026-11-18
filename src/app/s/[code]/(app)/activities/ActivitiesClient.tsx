@@ -197,7 +197,7 @@ export default function ActivitiesClient({ code }: { code: string }) {
               <option value="concept">개념 확인</option>
               <option value="escape">탈출 게임</option>
               <option value="mystery">추리 게임</option>
-              <option value="practice">실습 기록</option>
+              <option value="practice">코드 탐구</option>
               <option value="analysis">자료 분석</option>
               <option value="discussion">토론·의견</option>
             </select>

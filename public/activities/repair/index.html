@@ -32,6 +32,7 @@
     var inst = RepairCenter.mount(document.getElementById("app"), {
       content: window.REPAIR_CONTENT,
       answers: startAnswers,
+      embedded: embedded,
       onChange: function (state) {
         toParent({ source: "repair-engine", type: "state", requests: state.requests, fixedCount: state.fixedCount, allDone: state.allDone });
         reportHeight();

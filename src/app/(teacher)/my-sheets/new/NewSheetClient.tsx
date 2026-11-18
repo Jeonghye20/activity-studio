@@ -30,7 +30,7 @@ const TYPE_OPTIONS: TypeOption[] = [
   { type: 'escape',     label: '탈출 게임',      desc: '관문을 통과하며 금고 열기' },
   { type: 'mystery',    label: '추리 게임',      desc: '단서를 모아 사건 해결' },
   { type: 'analysis',   label: '자료 분석',      desc: '데이터와 자료를 해석', recommended: true },
-  { type: 'practice',   label: '실습 기록',      desc: '실습 과정과 결과 기록' },
+  { type: 'practice',   label: '코드 탐구',      desc: '코드를 읽고 잘못된 부분 고치기' },
   { type: 'discussion', label: '토론·의견',      desc: '의견을 쓰고 근거 정리' },
   { type: 'free',       label: '자유형 (빈 틀)',  desc: '유형 없이 자유롭게 구성' },
 ];

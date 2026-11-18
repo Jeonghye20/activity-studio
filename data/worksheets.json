@@ -550,6 +550,41 @@
     ]
   },
   {
+    "id": "ws-exercise-counter",
+    "unit": "Ⅰ-2-01",
+    "title": "운동 횟수 표시 장치",
+    "type": "practice",
+    "minutes": 20,
+    "goal": "이벤트 블록과 변수를 사용한 프로그램을 읽고, 잘못된 부분을 찾아 고칠 수 있다.",
+    "keywords": [
+      "이벤트",
+      "변수",
+      "마이크로비트",
+      "메이크코드"
+    ],
+    "situations": [],
+    "wrapOn": false,
+    "heroImg": "/activities/repair/assets/prop-tray.png",
+    "sections": [
+      {
+        "role": "main",
+        "title": "",
+        "blocks": [
+          {
+            "id": "repair1",
+            "kind": "embed",
+            "method": "코드 탐구",
+            "prompt": "운동 횟수 표시 장치",
+            "bare": true,
+            "answers": true,
+            "src": "/activities/repair/index.html"
+          }
+        ]
+      }
+    ],
+    "heroFit": "contain"
+  },
+  {
     "id": "ws-sleeptemp",
     "unit": "Ⅰ-2-02",
     "title": "밤에만 켜지는 온도 알림이 설계하기",

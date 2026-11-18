@@ -39,7 +39,7 @@ export const TYPES: Record<TypeKey, TypeInfo> = {
     ],
   },
   practice: {
-    name: '실습 기록', c: '#0ca678', d: '만들고 기록하며 고칠 점 찾기', n: 5,
+    name: '코드 탐구', c: '#0ca678', d: '코드를 읽고 잘못된 부분 고치기', n: 5,
     art: [
       '.1.1.1.1.1..',
       '11111111111.',

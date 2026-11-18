@@ -44,6 +44,7 @@
     var C = opts.content || window.REPAIR_CONTENT;
     var onChange = typeof opts.onChange === "function" ? opts.onChange : function () {};
     var onSolved = typeof opts.onSolved === "function" ? opts.onSolved : function () {};
+    var embedded = !!opts.embedded;   // 활동지에 끼워진 경우: 판 안 마지막 제출하기 버튼 숨김
     var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // 요청별 상태
@@ -518,7 +519,8 @@
       var all = allDone();
       var btn;
       if (all) {
-        btn = h("button", "rp-next ready", { type: "button", on: { click: function () { onSolved(); } } }, C.ui.submit);
+        // 끼워진 경우: 마지막 제출하기 버튼 없이 "고친 요청 3 / 3"만. 단독은 제출하기.
+        btn = embedded ? null : h("button", "rp-next ready", { type: "button", on: { click: function () { onSolved(); } } }, C.ui.submit);
       } else {
         btn = h("button", "rp-next" + (done ? " ready" : ""), { type: "button", disabled: done ? null : "", on: { click: nextRequest } }, C.ui.nextReq);
       }

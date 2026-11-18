@@ -77,7 +77,7 @@ export const TYPE_LABEL: Record<WorksheetType, string> = {
   concept: '개념 확인',
   escape: '탈출 게임',
   mystery: '추리 게임',
-  practice: '실습 기록',
+  practice: '코드 탐구',
   analysis: '자료 분석',
   discussion: '토론·의견',
   free: '자유형',

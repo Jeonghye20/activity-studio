@@ -3,7 +3,7 @@
   'use strict';
   const TYPE = {
     concept: ['개념 확인', false], escape: ['탈출 게임', true], mystery: ['추리 게임', true],
-    practice: ['실습 기록', false], analysis: ['자료 분석', false], discussion: ['토론·의견', false]
+    practice: ['코드 탐구', false], analysis: ['자료 분석', false], discussion: ['토론·의견', false]
   };
 
   function h(tag, attrs, kids) {
@@ -238,6 +238,15 @@
     function onMsg(e) {
       if (e.source !== frame.contentWindow) return;
       const d = e.data || {};
+      // 수리 센터(repair-engine): 높이·완료 여부
+      if (d.source === 'repair-engine') {
+        if (d.type === 'height') { curH = Math.ceil(d.height) || curH; if (!fs) frame.style.height = curH + 'px'; }
+        else if (d.type === 'state' || d.type === 'solved' || d.type === 'ready') {
+          const done = d.type === 'solved' ? true : (d.allDone != null ? d.allDone : !!(d.state && d.state.allDone));
+          if (done !== saved) { saved = done; ctx && ctx.changed && ctx.changed(); }
+        }
+        return;
+      }
       if (d.type === 'opinion:height') {
         curH = Math.ceil(d.height) || curH;
         if (!fs) frame.style.height = curH + 'px';
@@ -564,8 +573,9 @@
       const textCol = h('div');
       textCol.append(h('h1', null, sheet.title));
       textCol.append(h('div', { class: 'goal' }, [h('b', null, '학습목표'), sheet.goal]));
-      const heroDiv = h('div', { class: 'ws-hero', style: 'padding:0;overflow:hidden;align-self:stretch' });
-      heroDiv.append(h('img', { src: sheet.heroImg, alt: '', style: 'width:100%;height:100%;min-height:160px;object-fit:cover;display:block' }));
+      const heroFit = sheet.heroFit === 'contain' ? 'contain' : 'cover';
+      const heroDiv = h('div', { class: 'ws-hero', style: 'overflow:hidden;align-self:stretch;padding:' + (heroFit === 'contain' ? '12px' : '0') });
+      heroDiv.append(h('img', { src: sheet.heroImg, alt: '', style: 'width:100%;height:100%;min-height:160px;object-fit:' + heroFit + ';display:block' }));
       headKids.push(h('div', { class: 'ws-intro' }, [textCol, heroDiv]));
     } else if (sheet.heroArt != null && DEVICE_ART[sheet.heroArt]) {
       const textCol = h('div');

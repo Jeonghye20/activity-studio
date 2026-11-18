@@ -41,7 +41,7 @@ sheet: id, unit, title, type, minutes, goal, keywords[], situations[], wrapOn, s
   sections: [start(시작 질문), main(핵심 활동), wrap(한 줄 정리)]
     blocks: { id, kind, method, prompt, hint?, explain?, gate?, reward?, ...kind별 필드 }
 ```
-- **유형(type, 수업 목적)** 6개: concept 개념 확인 · escape 탈출 게임 · mystery 추리 게임 · practice 실습 기록 · analysis 자료 분석 · discussion 토론·의견
+- **유형(type, 수업 목적)** 6개: concept 개념 확인 · escape 탈출 게임 · mystery 추리 게임 · practice 코드 탐구 · analysis 자료 분석 · discussion 토론·의견
 - **활동 방법(method, 문항 형식)** 14개 ↔ kind
   | 활동 방법 | kind |
   |---|---|
