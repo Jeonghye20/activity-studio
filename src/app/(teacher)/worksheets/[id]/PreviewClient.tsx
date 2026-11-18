@@ -16,9 +16,74 @@ interface Props {
 
 const GAME_TYPES: string[] = ['escape', 'mystery'];
 
+const UNGRADED_KINDS = new Set(['bitvault', 'embed', 'story', 'note']);
+function isGradedBlock(b: Record<string, unknown>): boolean {
+  const k = b.kind as string;
+  if (UNGRADED_KINDS.has(k)) return false;
+  if (k === 'write') {
+    const kws = b.keywords as unknown[] | undefined;
+    return b.graded !== false && Array.isArray(kws) && kws.length > 0;
+  }
+  return true;
+}
+
 export default function PreviewClient({ sheet, units }: Props) {
   const [showAnswers, setShowAnswers] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [ansHint, setAnsHint] = useState(false);
+
+  // 채점하는 문항이 하나도 없으면 '정답 보기'를 막는다 (정답이 없는 활동)
+  const hasGraded = sheet.sections.some(s =>
+    (s.blocks as Record<string, unknown>[]).some(isGradedBlock)
+  );
+
+  function renderAnswerSwitch() {
+    if (!hasGraded) {
+      return (
+        <span style={{ position: 'relative', display: 'block', marginTop: 4 }}>
+          <button
+            className="switch"
+            aria-disabled="true"
+            aria-describedby="ans-off-hint"
+            onClick={e => e.preventDefault()}
+            onMouseEnter={() => setAnsHint(true)}
+            onMouseLeave={() => setAnsHint(false)}
+            onFocus={() => setAnsHint(true)}
+            onBlur={() => setAnsHint(false)}
+            style={{ width: '100%', textAlign: 'left', opacity: 0.45, cursor: 'not-allowed' }}
+          >
+            정답 보기
+            <div className="t" />
+          </button>
+          {ansHint && (
+            <span
+              id="ans-off-hint"
+              role="tooltip"
+              style={{
+                position: 'absolute', bottom: '100%', left: 0, marginBottom: 6,
+                background: 'var(--navy)', color: '#fff', fontSize: 12, lineHeight: 1.4,
+                padding: '7px 10px', borderRadius: 8, width: 'max-content', maxWidth: 240,
+                wordBreak: 'keep-all', zIndex: 5, boxShadow: '0 6px 16px rgba(23,32,54,.25)',
+              }}
+            >
+              정답이 없는 활동이라 정답 보기를 쓸 수 없습니다
+            </span>
+          )}
+        </span>
+      );
+    }
+    return (
+      <button
+        className="switch"
+        onClick={() => setShowAnswers(v => !v)}
+        aria-pressed={showAnswers}
+        style={{ width: '100%', textAlign: 'left', marginTop: 4 }}
+      >
+        정답 보기
+        <div className={`t${showAnswers ? ' on' : ''}`} />
+      </button>
+    );
+  }
 
   useEffect(() => {
     const existing = loadMySheets();
@@ -111,15 +176,7 @@ export default function PreviewClient({ sheet, units }: Props) {
                   {saved ? '담아뒀어요' : '담아두기'}
                 </button>
               </div>
-              <button
-                className="switch"
-                onClick={() => setShowAnswers(v => !v)}
-                aria-pressed={showAnswers}
-                style={{ width: '100%', textAlign: 'left', marginTop: 4 }}
-              >
-                정답 보기
-                <div className={`t${showAnswers ? ' on' : ''}`} />
-              </button>
+              {renderAnswerSwitch()}
             </div>
           </div>
 
@@ -181,15 +238,7 @@ export default function PreviewClient({ sheet, units }: Props) {
                   {saved ? '담아뒀어요' : '담아두기'}
                 </button>
               </div>
-              <button
-                className="switch"
-                onClick={() => setShowAnswers(v => !v)}
-                aria-pressed={showAnswers}
-                style={{ width: '100%', textAlign: 'left', marginTop: 4 }}
-              >
-                정답 보기
-                <div className={`t${showAnswers ? ' on' : ''}`} />
-              </button>
+              {renderAnswerSwitch()}
             </div>
           </div>
 

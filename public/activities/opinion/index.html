@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>의견 저울 — 내 생각은 어느 쪽으로 기울까요?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="opinion.css">
+<style>
+  /* 단독 확인용 페이지 바탕 */
+  html,body{margin:0;background:#eef0f7}
+  .op-page{max-width:900px;margin:0 auto;padding:22px 20px 40px}
+  /* 활동지에 끼웠을 때: 바탕 투명, 판 그림자(오른쪽·아래 6px)만 들어갈 최소 여백 */
+  html.embedded,html.embedded body{background:transparent}
+  html.embedded .op-page{max-width:none;margin:0;padding:2px 10px 12px 2px}
+</style>
+</head>
+<body>
+  <div class="op-page">
+    <div id="app"></div>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="opinion.js"></script>
+  <script>
+    var embedded = window.parent && window.parent !== window;
+    function toParent(msg) { if (embedded) window.parent.postMessage(msg, "*"); }
+
+    if (embedded) document.documentElement.classList.add("embedded");
+
+    // 처음 값: ?value=<JSON>
+    var initial = null;
+    try {
+      var q = new URLSearchParams(location.search).get("value");
+      if (q) initial = JSON.parse(q);
+    } catch (e) {}
+
+    var inst = OpinionScale.mount(document.getElementById("app"), {
+      content: window.OPINION_CONTENT,
+      value: initial,
+      onChange: function (value) {
+        toParent({ type: "opinion:change", value: value });
+        reportHeight();
+      },
+      onFullscreen: function (on) {
+        // 전체화면은 끼운 자리 안이 아니라 브라우저 창 전체를 덮어야 한다 → 부모가 iframe 을 키운다
+        toParent({ type: "opinion:fullscreen", on: on });
+        if (!on) setTimeout(reportHeight, 50);
+      },
+      onNavigate: function () {
+        // 화면이 바뀌면 판의 맨 위가 보이도록 부드럽게 스크롤한 뒤 타이핑이 시작된다
+        if (embedded) toParent({ type: "opinion:scrollIntoView" });
+        else { var b = document.querySelector(".op-board"); if (b) b.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      },
+    });
+
+    // 판 높이에 맞춰 끼운 자리 높이를 알린다 (스크롤 막대 없이)
+    function reportHeight() {
+      if (!embedded) return;
+      var page = document.querySelector(".op-page");
+      var h = Math.max(page.scrollHeight, page.getBoundingClientRect().height);
+      toParent({ type: "opinion:height", height: h });
+    }
+    if (window.ResizeObserver) {
+      new ResizeObserver(reportHeight).observe(document.querySelector(".op-page"));
+    } else {
+      window.addEventListener("resize", reportHeight);
+    }
+    window.addEventListener("load", reportHeight);
+
+    // 바깥 화면이 값을 넣거나 현재 값을 읽을 수 있게 한다
+    window.addEventListener("message", function (e) {
+      var d = e.data || {};
+      if (d.type === "opinion:set") inst.setValue(d.value);
+      else if (d.type === "opinion:get" && e.source) {
+        e.source.postMessage({ type: "opinion:value", value: inst.getValue() }, "*");
+      }
+    });
+
+    // 끼운 직후 부모가 바로 읽을 수 있게 준비 완료 알림 + 첫 높이
+    toParent({ type: "opinion:ready", value: inst.getValue() });
+    reportHeight();
+  </script>
+</body>
+</html>

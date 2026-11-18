@@ -228,6 +228,34 @@
     return { el: frame, answered: () => true, check: () => true, ungraded: true, reveal: () => {} };
   };
 
+  // 끼우는 활동(의견 저울 등): index.html 을 iframe 으로 끼운다. 채점 안 함.
+  // iframe 쪽에서 postMessage 로 높이·전체화면·저장 여부를 알려 준다.
+  C.embed = function (b, ctx) {
+    const INLINE = 'width:100%;border:none;display:block;';
+    const frame = h('iframe', { src: b.src, title: b.title || '활동', loading: 'lazy', scrolling: 'no' });
+    frame.style.cssText = INLINE + 'height:560px;';
+    let curH = 560, saved = false, fs = false;
+    function onMsg(e) {
+      if (e.source !== frame.contentWindow) return;
+      const d = e.data || {};
+      if (d.type === 'opinion:height') {
+        curH = Math.ceil(d.height) || curH;
+        if (!fs) frame.style.height = curH + 'px';
+      } else if (d.type === 'opinion:fullscreen') {
+        fs = !!d.on;
+        if (fs) frame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:none;z-index:2147483000;display:block;';
+        else { frame.style.cssText = INLINE; frame.style.height = curH + 'px'; }
+      } else if (d.type === 'opinion:scrollIntoView') {
+        if (!fs) frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (d.type === 'opinion:change' || d.type === 'opinion:ready' || d.type === 'opinion:value') {
+        const s = !!(d.value && d.value.saved);
+        if (s !== saved) { saved = s; ctx && ctx.changed && ctx.changed(); }
+      }
+    }
+    window.addEventListener('message', onMsg);
+    return { el: frame, answered: () => saved, check: () => true, ungraded: true, reveal: () => {} };
+  };
+
   C.reveal = function (b, ctx) {
     const n = b.pixels.length, g = b.grid, px = 200 / n;
     let svg = '<svg width="200" height="200" viewBox="0 0 200 200" aria-hidden="true"><rect width="200" height="200" fill="#fff"/>';
@@ -532,7 +560,14 @@
     const headKids = [
       opt.hideMeta ? null : h('div', { class: 'ws-meta' }, [h('span', { class: 'tag type' }, typeName), h('span', null, unitLabel + ' · ' + sheet.minutes + '분')]),
     ];
-    if (sheet.heroArt != null && DEVICE_ART[sheet.heroArt]) {
+    if (sheet.heroImg) {
+      const textCol = h('div');
+      textCol.append(h('h1', null, sheet.title));
+      textCol.append(h('div', { class: 'goal' }, [h('b', null, '학습목표'), sheet.goal]));
+      const heroDiv = h('div', { class: 'ws-hero', style: 'padding:0;overflow:hidden;align-self:stretch' });
+      heroDiv.append(h('img', { src: sheet.heroImg, alt: '', style: 'width:100%;height:100%;min-height:160px;object-fit:cover;display:block' }));
+      headKids.push(h('div', { class: 'ws-intro' }, [textCol, heroDiv]));
+    } else if (sheet.heroArt != null && DEVICE_ART[sheet.heroArt]) {
       const textCol = h('div');
       textCol.append(h('h1', null, sheet.title));
       textCol.append(h('div', { class: 'goal' }, [h('b', null, '학습목표'), sheet.goal]));
@@ -614,11 +649,11 @@
         }
         paintSum();
       }
-      const qn = b.kind !== 'note' ? h('span', { class: 'blk-n' }, (++blkNo < 10 ? '0' : '') + blkNo) : null;
-      const hasMeta = b._g || opt.answers || opt.edit;
+      const qn = (b.kind !== 'note' && !b.bare) ? h('span', { class: 'blk-n' }, (++blkNo < 10 ? '0' : '') + blkNo) : null;
+      const hasMeta = (b._g || opt.answers || opt.edit) && !b.bare;
       const top = hasMeta ? h('div', { class: 'blk-top' }, [b._g ? h('span', { class: 'gate-tag' }, '관문 ' + b._g) : null, (opt.answers || opt.edit) ? h('span', { class: 'method' }, b.method) : null]) : null;
-      const promptEl = h('p', { class: 'prompt' }, b.prompt);
-      const promptRow = qn ? h('div', { class: 'blk-prompt-row' }, [qn, promptEl]) : promptEl;
+      const promptEl = b.bare ? null : h('p', { class: 'prompt' }, b.prompt);
+      const promptRow = b.bare ? null : (qn ? h('div', { class: 'blk-prompt-row' }, [qn, promptEl]) : promptEl);
       const hintbtn = hint ? h('button', { class: 'hintbtn', type: 'button', onclick: () => hint.classList.toggle('show') }, '힌트 보기') : null;
       const blkFooter = (checkBtn || hintbtn) ? h('div', { class: 'blk-footer' }, [fb, hintbtn, checkBtn]) : null;
       const codeTop = b.code && b.kind !== 'table' ? h('div', { style: 'margin-bottom:12px' }, codeView(b.code)) : null;
@@ -666,7 +701,8 @@
     function paintSum() {
       const graded = blocks.filter(x => !x.api.ungraded);
       const answered = blocks.filter(x => x.api.answered()).length;
-      sum.innerHTML = `답한 문항 <b>${answered}/${blocks.length}</b> · 확인해서 맞힌 문항 <b>${graded.filter(x => x.passed).length}/${graded.length}</b>`;
+      const gradedPart = graded.length ? ` · 확인해서 맞힌 문항 <b>${graded.filter(x => x.passed).length}/${graded.length}</b>` : '';
+      sum.innerHTML = `답한 문항 <b>${answered}/${blocks.length}</b>${gradedPart}`;
     }
 
     function submit() {
