@@ -57,28 +57,27 @@
 .rp-reqrow{
   position:relative;background:var(--green-l);
   border-top:6px solid #cfe0da;
-  display:grid;grid-template-columns:200px minmax(0,1fr) auto;gap:18px;
-  padding:20px 24px;align-items:start;
+  display:grid;grid-template-columns:184px minmax(0,1fr) 158px;gap:8px;
+  padding:18px 16px;align-items:start;
 }
 .rp-tech{width:184px;height:276px;object-fit:contain;object-position:bottom;align-self:end;justify-self:center}
 
 /* 모니터 (천장 매단) */
-.rp-monitor{width:540px;max-width:100%;margin:0 auto;justify-self:center}
+.rp-monitor{width:100%;max-width:540px;margin:0 auto;justify-self:stretch}
 /* 모니터 틀: frame-monitor.png 를 border-image 로 (위 80 · 양옆 49 · 아래 15). 기둥+남색 윗테두리가 위 80px 에 들어가 네 변이 닫힌다 */
 .rp-mon-box{
   position:relative;
   border-style:solid;
-  border-width:80px 49px 15px;
-  border-image:var(--mon-img) 161 98 31 fill / 80px 49px 15px;
-  padding:12px 16px 14px;
-  background:var(--screen);
+  border-width:80px 20px 15px;
+  border-image:var(--mon-img) 161 98 31 fill / 80px 20px 15px;
+  padding:12px 14px 14px;
 }
 .rp-mon-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .rp-mon-no{font-weight:800;font-size:15px;color:var(--green-d)}
 .rp-mon-state{font-size:13px;font-weight:700;color:var(--sub);background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:2px 10px}
 .rp-mon-state.done{color:#fff;background:var(--green-m);border-color:var(--green-m)}
 .rp-mon-body{display:flex;align-items:center;gap:14px}
-.rp-friend{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 0 2px var(--green-m);flex:none}
+.rp-friend{width:60px;height:60px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 0 2px var(--green-m);flex:none}
 .rp-mon-who b{font-size:14px;color:var(--sub);font-weight:700}
 .rp-mon-say{font-size:19px;font-weight:800;line-height:1.4;margin-top:2px}
 .rp-mon-foldbtn{margin-top:10px;height:44px;padding:0 16px;border:2px solid var(--green-d);color:var(--green-d);background:#fff;border-radius:10px;font-size:14px;font-weight:800}

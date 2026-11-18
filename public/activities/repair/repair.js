@@ -205,8 +205,8 @@
       var col = theme === "orange" ? "#ffa94d" : theme === "green" ? "#69db7c" : "#63e6be";
       // 다시 볼 때: 동그란 놀란 눈
       if (theme === "orange") return '<svg class="rp-eye" viewBox="0 0 30 20"><circle cx="15" cy="10" r="7" fill="none" stroke="' + col + '" stroke-width="4"/></svg>';
-      // 웃는 반달 눈
-      return '<svg class="rp-eye" viewBox="0 0 30 20"><path d="M3 8 Q15 17 27 8" fill="none" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/></svg>';
+      // 웃는 반달 눈 (가운데가 위로 볼록 ︵)
+      return '<svg class="rp-eye" viewBox="0 0 30 20"><path d="M3 13 Q15 4 27 13" fill="none" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/></svg>';
     }
     // 이름표 앞 문서 아이콘 (모서리 접힌 종이 + 가로줄 2개, 글자색 상속)
     function docIconSvg() {
