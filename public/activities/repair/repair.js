@@ -371,8 +371,9 @@
       var ledVal = r.led == null
         ? h("span", "vv empty", { text: C.ui.ledEmpty })
         : h("span", "vv", { text: String(r.led) });
-      var ledIcon = h("span", "ic", null, [h("i")]);
-      var varIcon = h("span", "ic", null, [boxSvg()]);
+      var ledDots = []; for (var di = 0; di < 9; di++) ledDots.push(h("i"));
+      var ledIcon = h("div", "rp-led-ic" + (r.led == null ? "" : " lit"), null, ledDots);
+      var varIcon = h("div", "rp-box-ic", null, [spanHTML(isoBoxSvg())]);
       var left = h("div", "rp-col-left", null, [
         h("div", "rp-inst", null, [h("span", "num", { text: "1" }), h("span", "tx", { text: C.inst1 })]),
         // 매트 + 장치
@@ -385,13 +386,13 @@
         ]),
         // 값 줄
         h("div", "rp-values", null, [
-          h("div", "rp-val left" + (r.led == null ? " off" : ""), null, [
+          h("div", "rp-val left", null, [
             ledIcon,
             h("div", "rp-val-col", null, [h("span", "nm", { text: C.ui.ledName }), ledVal]),
           ]),
           h("div", "rp-val right", null, [
             varIcon,
-            h("div", "rp-val-col", null, [h("span", "nm", { text: C.ui.varName }), h("span", "vv", { text: String(r.count) })]),
+            h("div", "rp-val-col", null, [h("span", "rp-redlabel", { text: C.ui.varName }), h("span", "vv", { text: String(r.count) })]),
           ]),
         ]),
         // 작업 메모
@@ -559,6 +560,8 @@
     }
     function shakeIcon() { return spanHTML('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg>'); }
     function boxSvg() { return spanHTML('<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>'); }
+    // 운동 횟수 = 값을 담는 상자(위에서 비스듬히 본 상자: 윗면 연분홍, 앞 두 면 흰, 빨간 선)
+    function isoBoxSvg() { return '<svg viewBox="0 0 40 40" fill="none" stroke="#d01c3f" stroke-width="2.4" stroke-linejoin="round"><polygon points="20,5 35,13 20,21 5,13" fill="#ffc9c9"/><polygon points="5,13 20,21 20,37 5,29" fill="#ffffff"/><polygon points="35,13 20,21 20,37 35,29" fill="#ffffff"/></svg>'; }
     function wifiSvg() { return spanHTML('<svg width="15" height="12" viewBox="0 0 24 18" fill="#cfd4e0"><path d="M12 15a2 2 0 110 4 2 2 0 010-4zM5 9a10 10 0 0114 0l-2 2a7 7 0 00-10 0zM1 5a16 16 0 0122 0l-2 2a13 13 0 00-18 0z"/></svg>'); }
 
     // 첫 그리기

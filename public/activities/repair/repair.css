@@ -63,7 +63,7 @@
 .rp-tech{width:184px;height:276px;object-fit:contain;object-position:bottom;align-self:end;justify-self:center}
 
 /* 모니터 (천장 매단) */
-.rp-monitor{width:100%;max-width:540px;margin:0 auto;justify-self:stretch}
+.rp-monitor{width:100%;max-width:540px;margin:0 auto;justify-self:stretch;container-type:inline-size}
 /* 모니터 틀: frame-monitor.png 를 border-image 로 (위 80 · 양옆 49 · 아래 15). 기둥+남색 윗테두리가 위 80px 에 들어가 네 변이 닫힌다 */
 .rp-mon-box{
   position:relative;
@@ -71,6 +71,11 @@
   border-width:80px 20px 15px;
   border-image:var(--mon-img) 161 98 31 fill / 80px 20px 15px;
   padding:12px 14px 14px;
+}
+/* 모니터가 540px 까지 넓어질 때만 양옆 테두리를 49px 로 되돌린다(좁을 땐 20px 유지). 불만 문장은 어느 폭에서도 한 줄 */
+@container (min-width:540px){
+  .rp-mon-box{border-width:80px 49px 15px;border-image:var(--mon-img) 161 98 31 fill / 80px 49px 15px}
+  .rp-mon-body .rp-friend{width:50px;height:50px}
 }
 .rp-mon-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .rp-mon-no{font-weight:800;font-size:15px;color:var(--green-d)}
@@ -189,20 +194,22 @@
 .rp-bot{width:84px;height:84px;object-fit:contain;flex:none}
 
 /* 값 표시 줄 */
-.rp-values{display:grid;grid-template-columns:1fr 1fr;margin-top:12px;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:#fff}
-.rp-val{display:flex;align-items:center;gap:10px;padding:9px 12px;min-width:0}
-.rp-val.left{border-right:2px solid var(--ink)}
+.rp-values{display:grid;grid-template-columns:1fr 1fr;margin-top:12px;border:1.5px solid #d5dbe3;border-radius:14px;overflow:hidden;background:#fff}
+.rp-val{display:flex;align-items:center;gap:12px;padding:12px 14px;min-width:0}
+.rp-val.left{border-right:1.5px solid #f3c2c9}
 .rp-val.right{background:#fff5f5}
-.rp-val .ic{width:30px;height:30px;border-radius:7px;flex:none;display:grid;place-items:center}
-.rp-val.left .ic{background:#0f1216}
-.rp-val.left .ic i{width:12px;height:12px;border-radius:2px;background:#ff6b6b;box-shadow:0 0 5px #ff6b6b}
-.rp-val.left.off .ic i{background:#2c3756;box-shadow:none}
-.rp-val.right .ic{background:var(--blk-red)}
-.rp-val-col{display:flex;flex-direction:column;min-width:0;line-height:1.1}
-.rp-val .nm{font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
-.rp-val.right .nm{color:var(--blk-red)}
-.rp-val .vv{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
-.rp-val.left .vv.empty{color:var(--ink)}
+/* LED 화면 그림: 검은 둥근 네모 + 3×3 점, 켜지면 가운데 십자 빨강 */
+.rp-led-ic{width:46px;height:46px;flex:none;background:#11161f;border-radius:10px;display:grid;grid-template-columns:repeat(3,8px);grid-auto-rows:8px;gap:9px;place-content:center;place-items:center}
+.rp-led-ic i{width:6px;height:6px;border-radius:50%;background:#2c3756}
+.rp-led-ic.lit i:nth-child(2),.rp-led-ic.lit i:nth-child(4),.rp-led-ic.lit i:nth-child(5),.rp-led-ic.lit i:nth-child(6),.rp-led-ic.lit i:nth-child(8){width:8px;height:8px;background:#ff6b6b;box-shadow:0 0 5px #ff6b6b}
+/* 운동 횟수 그림: 빨간 선 아이소메트릭 상자 */
+.rp-box-ic{width:46px;height:46px;flex:none;display:grid;place-items:center}
+.rp-box-ic svg{width:40px;height:40px;display:block}
+.rp-val-col{display:flex;flex-direction:column;min-width:0;gap:3px;line-height:1.05}
+.rp-val .nm{font-size:13.5px;font-weight:700;color:#5d6880;white-space:nowrap}
+.rp-redlabel{align-self:flex-start;font-size:13px;font-weight:700;color:#fff;background:#d01c3f;border-radius:4px;padding:2px 8px;white-space:nowrap}
+.rp-val .vv{font-size:26px;font-weight:800;color:#14181f;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rp-val.left .vv.empty{color:#14181f}
 
 /* 작업 메모 (로봇 머리) */
 .rp-memo{position:relative;margin-top:16px}
