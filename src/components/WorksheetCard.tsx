@@ -14,9 +14,15 @@ interface Props {
 export default function WorksheetCard({ sheet, unitTitle, isNew, saved: _saved }: Props) {
   return (
     <Link href={`/worksheets/${sheet.id}`} className="ws-card2" style={{ textDecoration: 'none' }}>
-      <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0, background: (sheet.heroImg && sheet.heroFit === 'contain') ? '#eef1fc' : undefined }}>
-        {sheet.heroImg && sheet.heroFit === 'contain' ? (
-          <img src={sheet.heroImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px 0', display: 'block', boxSizing: 'border-box' }} />
+      <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0, background: sheet.heroFit === 'contain' ? '#eef1fc' : undefined }}>
+        {sheet.heroImg && sheet.heroFit ? (
+          <img
+            src={sheet.heroImg}
+            alt=""
+            style={sheet.heroFit === 'contain'
+              ? { width: '100%', height: '100%', objectFit: 'contain', padding: '8px 0', display: 'block', boxSizing: 'border-box' }
+              : { width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
         ) : (
           <TypeCover type={sheet.type as TypeKey} height={120} block={false} />
         )}

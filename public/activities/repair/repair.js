@@ -202,10 +202,15 @@
       return "mint";
     }
     function eyeSvg(theme) {
-      var col = theme === "orange" ? "#ffa94d" : theme === "green" ? "#51cf66" : "#63e6be";
-      if (theme === "orange") return '<svg class="rp-eye" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="' + col + '" stroke-width="2.5"/></svg>';
+      var col = theme === "orange" ? "#ffa94d" : theme === "green" ? "#69db7c" : "#63e6be";
+      // 다시 볼 때: 동그란 놀란 눈
+      if (theme === "orange") return '<svg class="rp-eye" viewBox="0 0 30 20"><circle cx="15" cy="10" r="7" fill="none" stroke="' + col + '" stroke-width="4"/></svg>';
       // 웃는 반달 눈
-      return '<svg class="rp-eye" viewBox="0 0 16 16"><path d="M2 9 A6 6 0 0 1 14 9" fill="none" stroke="' + col + '" stroke-width="2.5" stroke-linecap="round"/></svg>';
+      return '<svg class="rp-eye" viewBox="0 0 30 20"><path d="M3 8 Q15 17 27 8" fill="none" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/></svg>';
+    }
+    // 이름표 앞 문서 아이콘 (모서리 접힌 종이 + 가로줄 2개, 글자색 상속)
+    function docIconSvg() {
+      return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M4 2h5l3 3v9H4z"/><path d="M9 2v3h3"/><path d="M6.3 9h3.4M6.3 11.3h3.4"/></svg>';
     }
     function memoTextFrag(r) {
       var k = r.memoKey;
@@ -281,7 +286,6 @@
       var mon;
       if (r.reqFolded) {
         mon = h("div", "rp-monitor", null, [
-          h("div", "rp-mon-cap"),
           h("div", "rp-mon-folded", null, [
             h("b", null, { text: "요청 " + r.def.no }), "· " + r.def.name + " · " + r.def.say,
             h("button", "un", { type: "button", on: { click: function () { r.reqFolded = false; render(); } } }, C.ui.reqUnfold),
@@ -290,8 +294,7 @@
       } else {
         var friend = "fr-" + friendKey(r.def.name) + (r.done ? "-happy" : "-worry");
         mon = h("div", "rp-monitor", null, [
-          h("div", "rp-mon-cap"),
-          h("div", "rp-mon-screen", null, [
+          h("div", "rp-mon-box", null, [
             h("div", "rp-mon-top", null, [
               h("span", "rp-mon-no", { text: "수리 요청 " + r.def.no + "번" }),
               h("span", "rp-mon-state" + (r.done ? " done" : ""), { text: r.done ? C.ui.doneTag : C.ui.received }),
@@ -313,7 +316,14 @@
       // 설명서 옆 버튼 (접힘 상태만)
       if (!st.manualOpen) {
         kids.push(h("div", "rp-manual-side", null, [
-          h("div", "rp-tablet-thumb"),
+          h("div", "rp-tablet-thumb", null, [
+            h("div", "rp-tablet-bezel", null, [
+              h("div", "rp-tablet-screen", null, [
+                h("img", null, { src: "assets/prop-jumprope.png", alt: "" }),
+                h("div", "rp-tablet-lines", null, [h("i"), h("i"), h("i"), h("i")]),
+              ]),
+            ]),
+          ]),
           h("button", "rp-btn-green", { type: "button", on: { click: function () { st.manualOpen = true; st.manualPage = 1; render(); } } }, C.ui.manualOpen),
         ]));
       }
@@ -411,13 +421,14 @@
 
     function memoEl(r, theme) {
       var tag = memoTag(r, theme);
+      var tagPill = h("span", "rp-memo-tag", null, [spanHTML(docIconSvg()), h("span", null, { text: tag })]);
       return h("div", "rp-memo " + theme, null, [
         h("div", "rp-memo-ant"),
         h("div", "rp-memo-ear l"), h("div", "rp-memo-ear r"),
         h("div", "rp-memo-box", null, [
           h("div", "rp-memo-screen", null, [
             h("div", "rp-memo-head", null, [
-              spanHTML(eyeSvg(theme)), h("span", "rp-memo-tag", { text: tag }), spanHTML(eyeSvg(theme)),
+              spanHTML(eyeSvg(theme)), tagPill, spanHTML(eyeSvg(theme)),
             ]),
             h("div", "rp-memo-text", null, [memoTextFrag(r)]),
           ]),

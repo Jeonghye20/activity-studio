@@ -564,7 +564,7 @@
     ],
     "situations": [],
     "wrapOn": false,
-    "heroImg": "/activities/repair/assets/prop-tray.png",
+    "heroImg": "/activities/repair/assets/repair-scene.png",
     "sections": [
       {
         "role": "main",
@@ -582,7 +582,7 @@
         ]
       }
     ],
-    "heroFit": "contain"
+    "heroFit": "cover"
   },
   {
     "id": "ws-sleeptemp",

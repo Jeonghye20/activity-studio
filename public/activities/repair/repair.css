@@ -64,15 +64,14 @@
 
 /* 모니터 (천장 매단) */
 .rp-monitor{width:540px;max-width:100%;margin:0 auto;justify-self:center}
-.rp-mon-cap{
-  height:70px;background-image:var(--mon-img);
-  background-size:540px auto;background-position:center -2px;background-repeat:no-repeat;
-}
-.rp-mon-screen{
-  position:relative;background:var(--screen);
-  border:11px solid var(--navy);border-top:0;border-radius:0 0 18px 18px;
-  margin-top:-2px;padding:14px 20px 18px;
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.4);
+/* 모니터 틀: frame-monitor.png 를 border-image 로 (위 80 · 양옆 49 · 아래 15). 기둥+남색 윗테두리가 위 80px 에 들어가 네 변이 닫힌다 */
+.rp-mon-box{
+  position:relative;
+  border-style:solid;
+  border-width:80px 49px 15px;
+  border-image:var(--mon-img) 161 98 31 fill / 80px 49px 15px;
+  padding:12px 16px 14px;
+  background:var(--screen);
 }
 .rp-mon-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .rp-mon-no{font-weight:800;font-size:15px;color:var(--green-d)}
@@ -94,12 +93,24 @@
 .rp-mon-folded .un{margin-left:auto;height:30px;padding:0 12px;border:2px solid rgba(255,255,255,.6);border-radius:7px;font-size:12px;font-weight:700;color:#fff}
 
 /* 설명서 옆 버튼 (접힘 상태) */
-.rp-manual-side{display:flex;flex-direction:column;align-items:center;gap:10px;align-self:center;width:118px}
+.rp-manual-side{display:flex;flex-direction:column;align-items:center;gap:14px;align-self:center;width:170px}
+/* 접힌 설명서: 기울어진 은색 가로 태블릿 */
 .rp-tablet-thumb{
-  width:84px;height:110px;border-radius:12px;background:#11131a;border:3px solid #c3c8d4;
-  transform:rotate(7deg);display:grid;place-items:center;box-shadow:3px 4px 0 rgba(0,0,0,.12);
+  width:156px;height:108px;border-radius:16px;padding:3px;
+  background:linear-gradient(135deg,#dfe3e8 0%,#9aa1ab 55%,#c9ced5 100%);
+  transform:rotate(-6deg);box-shadow:0 7px 14px rgba(20,24,31,.22);
 }
-.rp-tablet-thumb::before{content:"";width:60%;height:60%;border:2px dashed #596;border-radius:6px;opacity:.5}
+.rp-tablet-bezel{width:100%;height:100%;background:#0e1014;border-radius:13px;padding:8px 10px 8px 14px}
+.rp-tablet-screen{
+  width:100%;height:100%;background:#fff;border-radius:5px;
+  display:flex;align-items:center;gap:8px;padding:7px 9px;
+}
+.rp-tablet-screen img{width:40px;height:40px;object-fit:contain;flex:none}
+.rp-tablet-lines{flex:1;display:flex;flex-direction:column;gap:5px}
+.rp-tablet-lines i{display:block;border-radius:3px}
+.rp-tablet-lines i:nth-child(1){height:5px;width:70%;background:#087f5b}
+.rp-tablet-lines i:nth-child(2),.rp-tablet-lines i:nth-child(3){height:4px;width:100%;background:#c9d1dc}
+.rp-tablet-lines i:nth-child(4){height:4px;width:60%;background:#c9d1dc}
 .rp-btn-green{
   height:44px;padding:0 16px;border:2px solid var(--green-d);background:var(--green-d);color:#fff;
   border-radius:10px;font-size:14px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:7px;
@@ -196,20 +207,27 @@
 
 /* 작업 메모 (로봇 머리) */
 .rp-memo{position:relative;margin-top:16px}
-.rp-memo-ear{position:absolute;top:30px;width:12px;height:34px;border-radius:6px;background:var(--green-m)}
-.rp-memo-ear.l{left:-8px}.rp-memo-ear.r{right:-8px}
+.rp-memo-ear{position:absolute;top:34px;width:13px;height:36px;border-radius:6px;background:#0fa678;border:2px solid #1b2230}
+.rp-memo-ear.l{left:-9px}.rp-memo-ear.r{right:-9px}
 .rp-memo-ant{position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:3px;height:14px;background:#b9c2bd}
 .rp-memo-ant::before{content:"";position:absolute;left:50%;top:-7px;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:var(--yellow);box-shadow:0 0 7px var(--yellow)}
 .rp-memo-box{
-  background:#fff7e6;border:3px solid #ead9b0;border-radius:18px;padding:8px;
+  background:#fbf4e9;border:3px solid #1b2230;border-radius:30px;padding:10px;
 }
 .rp-memo-screen{
-  background:#1b2550;border-radius:12px;padding:12px 14px;color:#fff;
-  box-shadow:0 0 0 3px var(--memo-ring,#63e6be) inset;
+  background:#1b2230;border-radius:20px;padding:12px 14px;color:#fff;
+  box-shadow:0 0 0 3px var(--memo-ring) inset;
 }
-.rp-memo-head{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
-.rp-eye{width:16px;height:16px;flex:none}
-.rp-memo-tag{font-size:13px;font-weight:800;letter-spacing:.02em}
+.rp-memo-head{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px}
+.rp-eye{width:30px;height:20px;flex:none}
+.rp-memo-tag{
+  display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;
+  border-radius:999px;font-size:13.5px;font-weight:800;line-height:1;
+}
+.rp-memo-tag svg{width:14px;height:14px;flex:none}
+.rp-memo.mint .rp-memo-tag{background:#d3f5e6;color:#087f5b}
+.rp-memo.green .rp-memo-tag{background:#d3f9d8;color:#1e6b2e}
+.rp-memo.orange .rp-memo-tag{background:#ffe8cc;color:#8a4b00}
 .rp-memo-text{font-size:17px;line-height:1.9;text-align:left}
 /* 보라 형광펜: 줄마다 글자 뒤에 깔리도록 인라인 배경 + box-decoration-break */
 .rp-hl{
@@ -219,10 +237,10 @@
   -webkit-box-decoration-break:clone;box-decoration-break:clone;
   padding:1px 3px;border-radius:3px;
 }
-/* 메모 색 테마 */
-.rp-memo.mint{--memo-ring:#63e6be}
+/* 메모 화면 안쪽 테두리 색: 기본 남색 · 맞음 초록 · 다시 주황 */
+.rp-memo.mint{--memo-ring:#3d4a6b}
 .rp-memo.orange{--memo-ring:#ffa94d}
-.rp-memo.green{--memo-ring:#51cf66}
+.rp-memo.green{--memo-ring:#69db7c}
 
 /* ---------- 오른쪽: 코드 칸 ---------- */
 .rp-code{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f3f4f6}
