@@ -165,8 +165,8 @@ export const DEMO_ALL_DONE: StudentActivity[] = [
     resultText: '의견 제출',
   },
   {
-    worksheetId: 'ws-exercise',
-    title: '흔들면 세어 주는 운동 횟수 표시 장치',
+    worksheetId: 'ws-exercise-counter',
+    title: '운동 횟수 표시 장치',
     type: 'practice',
     submittedAt: '2026-09-08T14:00:00',
     status: 'done',
