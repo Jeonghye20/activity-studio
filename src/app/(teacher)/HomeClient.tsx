@@ -151,7 +151,7 @@ function SectionHead({ id, title, sub, href, icon }: { id: string; title: string
 }
 
 /* ── 활동지 카드 ── */
-const EXCLUDE_IDS = ['ws-physical', 'ws-vault', 'ws-cs-escape', 'ws-robot', 'ws-privacy'];
+const EXCLUDE_IDS = ['ws-physical', 'ws-vault', 'ws-cs-escape', 'ws-robot', 'ws-privacy', 'ws-ramen'];
 
 function WsCard({ sheet, unitTitle, isNew, isPreparing }: { sheet: WorksheetSummary; unitTitle?: string; isNew?: boolean; isPreparing?: boolean }) {
   return (
@@ -173,12 +173,12 @@ function WsCard({ sheet, unitTitle, isNew, isPreparing }: { sheet: WorksheetSumm
           }}>준비중</span>
         </div>
       )}
-      <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0, background: sheet.heroFit === 'contain' ? '#eef1fc' : undefined }}>
-        {sheet.heroImg ? (
+      <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0, background: (sheet.cardFit ?? sheet.heroFit) === 'contain' ? '#eef1fc' : undefined }}>
+        {(sheet.cardImg ?? sheet.heroImg) ? (
           <img
-            src={sheet.heroImg}
+            src={sheet.cardImg ?? sheet.heroImg}
             alt=""
-            style={sheet.heroFit === 'contain'
+            style={(sheet.cardFit ?? sheet.heroFit) === 'contain'
               ? { width: '100%', height: '100%', objectFit: 'contain', padding: '8px 0', display: 'block', boxSizing: 'border-box' }
               : { width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
