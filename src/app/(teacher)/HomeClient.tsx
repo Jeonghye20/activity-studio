@@ -151,7 +151,7 @@ function SectionHead({ id, title, sub, href, icon }: { id: string; title: string
 }
 
 /* ── 활동지 카드 ── */
-const EXCLUDE_IDS = ['ws-physical', 'ws-vault', 'ws-cs-escape', 'ws-robot', 'ws-privacy'];
+const EXCLUDE_IDS = ['ws-physical', 'ws-vault', 'ws-cs-escape', 'ws-robot', 'ws-privacy', 'ws-ramen'];
 
 function WsCard({ sheet, unitTitle, isNew, isPreparing }: { sheet: WorksheetSummary; unitTitle?: string; isNew?: boolean; isPreparing?: boolean }) {
   return (
