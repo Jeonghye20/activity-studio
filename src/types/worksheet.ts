@@ -42,6 +42,8 @@ export interface Worksheet {
   heroArt?: number;
   heroImg?: string;
   heroFit?: string;
+  cardImg?: string;
+  cardFit?: string;
   sections: Section[];
 }
 
@@ -56,6 +58,8 @@ export interface WorksheetSummary {
   situations: Situation[];
   heroImg?: string;
   heroFit?: string;
+  cardImg?: string;
+  cardFit?: string;
 }
 
 export interface CurriculumUnit {

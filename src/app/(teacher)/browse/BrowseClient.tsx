@@ -70,6 +70,7 @@ export default function BrowseClient({ worksheets, unitMap }: Props) {
   }, [baseList, typeFilter, search, unitMap]);
 
   const sectionTitle = from ? (FROM_TITLE[from] ?? null) : null;
+  const recentSet = useMemo(() => new Set(RECENT_IDS as readonly string[]), []);
 
   return (
     <div className="p-main">
@@ -174,7 +175,7 @@ export default function BrowseClient({ worksheets, unitMap }: Props) {
       ) : (
         <div className="ws-grid4">
           {filtered.map(s => (
-            <WorksheetCard key={s.id} sheet={s} unitTitle={unitMap[s.unit]} />
+            <WorksheetCard key={s.id} sheet={s} unitTitle={unitMap[s.unit]} isNew={recentSet.has(s.id)} />
           ))}
         </div>
       )}

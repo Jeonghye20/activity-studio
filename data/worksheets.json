@@ -1,6 +1,7 @@
 [
   {
     "id": "ws-cs-escape",
+    "cardImg": "/activities/cards/cs-escape.jpg",
     "unit": "Ⅰ-1-01",
     "title": "잠긴 정보실 컴퓨터를 깨워라",
     "type": "escape",
@@ -208,6 +209,7 @@
   },
   {
     "id": "ws-physical",
+    "cardImg": "/activities/cards/sensor-plant.jpg",
     "unit": "Ⅰ-1-02",
     "title": "센서가 알아채고, 장치가 움직인다",
     "type": "concept",
@@ -388,6 +390,7 @@
   },
   {
     "id": "ws-exercise-counter",
+    "cardImg": "/activities/cards/repair-scene.jpg",
     "unit": "Ⅰ-2-01",
     "title": "운동 횟수 표시 장치",
     "type": "practice",
@@ -1222,6 +1225,7 @@
   },
   {
     "id": "ws-vault",
+    "cardImg": "/activities/cards/bit-vault.jpg",
     "unit": "Ⅱ-1-02",
     "title": "비트 금고를 열어라",
     "type": "escape",
@@ -2375,6 +2379,7 @@
   },
   {
     "id": "ws-ramen",
+    "cardImg": "/activities/cards/ramen-pot.jpg",
     "unit": "Ⅲ-1-03",
     "title": "사건 파일: 로봇이 끓인 이상한 라면",
     "type": "mystery",
@@ -2547,6 +2552,7 @@
   },
   {
     "id": "ws-robot",
+    "cardImg": "/activities/cards/robot-scene.jpg",
     "unit": "Ⅲ-1-03",
     "title": "탐사 로봇을 움직여라",
     "type": "escape",
@@ -5055,6 +5061,7 @@
   },
   {
     "id": "ws-ai-ethics",
+    "cardImg": "/activities/cards/opinion-classroom.jpg",
     "unit": "Ⅳ-2-04",
     "title": "얼굴 인식 출석, 해도 될까?",
     "type": "discussion",
@@ -5867,6 +5874,7 @@
   },
   {
     "id": "ws-privacy",
+    "cardImg": "/activities/cards/account-photo.jpg",
     "unit": "Ⅴ-2-03",
     "title": "사건 파일: 누가 내 계정에 들어왔을까?",
     "type": "mystery",

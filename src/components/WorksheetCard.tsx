@@ -12,14 +12,16 @@ interface Props {
 }
 
 export default function WorksheetCard({ sheet, unitTitle, isNew, saved: _saved }: Props) {
+  const cardImg = sheet.cardImg ?? sheet.heroImg;
+  const cardFit = sheet.cardFit ?? sheet.heroFit ?? 'cover';
   return (
     <Link href={`/worksheets/${sheet.id}`} className="ws-card2" style={{ textDecoration: 'none' }}>
-      <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0, background: sheet.heroFit === 'contain' ? '#eef1fc' : undefined }}>
-        {sheet.heroImg && sheet.heroFit ? (
+      <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0, background: cardFit === 'contain' ? '#eef1fc' : undefined }}>
+        {cardImg ? (
           <img
-            src={sheet.heroImg}
+            src={cardImg}
             alt=""
-            style={sheet.heroFit === 'contain'
+            style={cardFit === 'contain'
               ? { width: '100%', height: '100%', objectFit: 'contain', padding: '8px 0', display: 'block', boxSizing: 'border-box' }
               : { width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />

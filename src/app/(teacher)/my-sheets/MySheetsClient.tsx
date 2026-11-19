@@ -179,7 +179,7 @@ function getWeekStart(): string {
   return now.toISOString().slice(0, 10);
 }
 
-export default function MySheetsClient() {
+export default function MySheetsClient({ thumbs = {} }: { thumbs?: Record<string, string> }) {
   const [sheets,     setSheets]     = useState<MySavedSheet[]>([]);
   const [deployLogs, setDeployLogs] = useState<DeployLog[]>([]);
   const [mainTab,    setMainTab]    = useState<MainTab>('mine');
@@ -344,6 +344,7 @@ export default function MySheetsClient() {
                 <SheetCard
                   key={s.id}
                   sheet={s}
+                  thumbImg={thumbs[s.worksheetId]}
                   deployed={deployedIds.has(s.worksheetId)}
                   deployInfo={deployedIds.has(s.worksheetId) ? getDeployInfoForWorksheet(s.worksheetId, deployLogs) : null}
                 />
@@ -537,15 +538,20 @@ export default function MySheetsClient() {
 /* ── 활동지 카드 ── */
 interface DeploySummary { classStr: string; dateStr: string; }
 
-export function SheetCard({ sheet, deployed, deployInfo }: {
+export function SheetCard({ sheet, deployed, deployInfo, thumbImg }: {
   sheet: MySavedSheet;
   deployed?: boolean;
   deployInfo?: DeploySummary | null;
+  thumbImg?: string;
 }) {
   return (
     <div className="ws-card2" style={{ cursor: 'default' }}>
       <div className="cover" style={{ aspectRatio: '5/3', borderRadius: 0 }}>
-        <TypeCover type={sheet.type as TypeKey} height={120} block={false} />
+        {thumbImg ? (
+          <img src={thumbImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        ) : (
+          <TypeCover type={sheet.type as TypeKey} height={120} block={false} />
+        )}
         <div className="corner" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <SourceIcon source={sheet.source} size={12} />
           {sheet.source === 'edit' ? '수정본' : sheet.source === 'create' ? '직접만든' : '책갈피'}
