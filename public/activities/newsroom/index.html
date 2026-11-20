@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>뉴스룸 웹북 — 데이터로 사실을 밝히는 신문 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap">
+<link rel="stylesheet" href="newsroom.css">
+<style>
+  html,body{margin:0;background:#eef0f7}
+  .nr-page{max-width:1240px;margin:0 auto;padding:16px 16px 28px}
+  /* 활동지에 끼웠을 때: 바탕 투명, 여백 최소 */
+  html.embedded,html.embedded body{background:transparent}
+  html.embedded .nr-page{max-width:none;margin:0;padding:4px}
+</style>
+</head>
+<body>
+  <div class="nr-page"><div id="app"></div></div>
+
+  <script src="content.js"></script>
+  <script src="newsroom.js"></script>
+  <script>
+    var embedded = window.parent && window.parent !== window;
+    function toParent(msg) { if (embedded) window.parent.postMessage(msg, "*"); }
+    if (embedded) document.documentElement.classList.add("embedded");
+
+    // 주소 ?answers=1 → 정답 보기를 켠 채 시작
+    var startAnswers = new URLSearchParams(location.search).get("answers") === "1";
+
+    var inst = Newsroom.mount(document.getElementById("app"), {
+      content: window.NEWSROOM_CONTENT,
+      answers: startAnswers,
+      embedded: embedded,
+      onChange: function (value) {
+        // 기존 이름(opinion:*)을 그대로 써서 ws.js·PreviewClient 를 고치지 않는다
+        toParent({ type: "opinion:change", value: value });
+        reportHeight();
+      },
+      onFullscreen: function (on) {
+        toParent({ type: "opinion:fullscreen", on: on });
+        if (!on) setTimeout(reportHeight, 60);
+      },
+    });
+
+    function reportHeight() {
+      if (!embedded) return;
+      var page = document.querySelector(".nr-page");
+      var h = Math.max(page.scrollHeight, page.getBoundingClientRect().height);
+      toParent({ type: "opinion:height", height: Math.ceil(h) });
+    }
+    if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.querySelector(".nr-page"));
+    else window.addEventListener("resize", reportHeight);
+    window.addEventListener("load", reportHeight);
+
+    // 바깥 → 모듈: 정답 보기 토글(상태 유지) / 현재 값 읽기
+    window.addEventListener("message", function (e) {
+      var d = e.data || {};
+      if (d.type === "repair:answers") inst.setAnswers(!!d.on);
+      else if (d.type === "opinion:get" && e.source) e.source.postMessage({ type: "opinion:value", value: inst.getValue() }, "*");
+    });
+
+    // 끼운 직후 부모가 바로 읽을 수 있게 준비 완료 알림 + 첫 높이
+    toParent({ type: "opinion:ready", value: inst.getValue() });
+    reportHeight();
+  </script>
+</body>
+</html>
