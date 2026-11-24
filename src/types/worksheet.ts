@@ -42,6 +42,7 @@ export interface Worksheet {
   heroArt?: number;
   heroImg?: string;
   heroFit?: string;
+  heroAlt?: string;
   cardImg?: string;
   cardFit?: string;
   sections: Section[];

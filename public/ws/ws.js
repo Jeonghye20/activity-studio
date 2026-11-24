@@ -575,7 +575,7 @@
       textCol.append(h('div', { class: 'goal' }, [h('b', null, '학습목표'), sheet.goal]));
       const heroFit = sheet.heroFit === 'contain' ? 'contain' : 'cover';
       const heroDiv = h('div', { class: 'ws-hero', style: 'overflow:hidden;align-self:stretch;padding:' + (heroFit === 'contain' ? '12px' : '0') });
-      heroDiv.append(h('img', { src: sheet.heroImg, alt: '', style: 'width:100%;height:100%;min-height:160px;object-fit:' + heroFit + ';display:block' }));
+      heroDiv.append(h('img', { src: sheet.heroImg, alt: sheet.heroAlt || '', style: 'width:100%;height:100%;min-height:160px;object-fit:' + heroFit + ';display:block' }));
       headKids.push(h('div', { class: 'ws-intro' }, [textCol, heroDiv]));
     } else if (sheet.heroArt != null && DEVICE_ART[sheet.heroArt]) {
       const textCol = h('div');
