@@ -5093,6 +5093,7 @@
             "method": "의견 저울",
             "prompt": "내 생각은 어느 쪽으로 기울까요?",
             "bare": true,
+            "answers": true,
             "src": "/activities/opinion/index.html"
           }
         ]
@@ -5133,6 +5134,7 @@
             "method": "의견 저울",
             "prompt": "내 생각은 어느 쪽으로 기울까요?",
             "bare": true,
+            "answers": true,
             "src": "/activities/opinion/index.html?set=kiosk"
           }
         ]

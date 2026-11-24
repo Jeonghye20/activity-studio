@@ -55,6 +55,8 @@
       saved: false,
       helpOpen: false,
       fullscreen: false,
+      answers: false,         // 교사 정답 보기 (바깥에서 setAnswers 로 켬)
+      memoOpen: false,        // 교사용 메모 펼침 여부
     };
     if (opts.value) applyValue(opts.value, true);
 
@@ -188,6 +190,38 @@
     prevBtn.addEventListener("click", goPrev);
     nextBtn.addEventListener("click", onNext);
 
+    // ---------- 교사용 메모 띠 (히어로 띠와 저울 판 사이, 정답 보기를 켰을 때만) ----------
+    var memoEl = null, memoRight = null, memoBody = null, memoBar = null;
+    if (Array.isArray(C.memo) && C.memo.length) {
+      memoEl = el("div", "op-tmemo"); memoEl.hidden = true;
+      memoBar = el("button", "op-tmemo-bar", { type: "button" });
+      memoBar.setAttribute("aria-expanded", "false");
+      var barL = el("div", "op-tmemo-barl");
+      barL.appendChild(el("span", "op-tmemo-tag", { text: "교사용" }));
+      barL.appendChild(el("span", "op-tmemo-title", { text: "교사용 메모" }));
+      memoRight = el("span", "op-tmemo-toggle", { text: "펼치기" });
+      memoBar.appendChild(barL); memoBar.appendChild(memoRight);
+      memoBody = el("div", "op-tmemo-body"); memoBody.hidden = true;
+      C.memo.forEach(function (sec) {
+        memoBody.appendChild(el("div", "op-tmemo-h", { text: sec.h }));
+        (sec.items || []).forEach(function (it) {
+          memoBody.appendChild(el("div", "op-tmemo-item", { text: "· " + it }));
+        });
+      });
+      memoBar.addEventListener("click", function () { st.memoOpen = !st.memoOpen; renderMemo(); });
+      memoEl.appendChild(memoBar); memoEl.appendChild(memoBody);
+      root.appendChild(memoEl);
+    }
+    function renderMemo() {
+      if (!memoEl) return;
+      var show = st.answers && !st.fullscreen;
+      memoEl.hidden = !show;
+      if (!show) return;
+      memoBody.hidden = !st.memoOpen;
+      memoRight.textContent = st.memoOpen ? "접기" : "펼치기";
+      memoBar.setAttribute("aria-expanded", st.memoOpen ? "true" : "false");
+    }
+
     root.appendChild(board);
 
     // ---------- 단계 이동 ----------
@@ -229,7 +263,7 @@
     function pickReason(r) { st.reason = r; render(); fire(); }
 
     // ---------- 그리기 ----------
-    function render() { renderChoiceBody(); updateChrome(); }
+    function render() { renderChoiceBody(); updateChrome(); renderMemo(); }
 
     function currentHostLine() {
       if (st.screen === "flip") return C.tidy.flip.host;
@@ -424,6 +458,8 @@
         var opts = el("div", "op-flip-opts");
         cd.options.forEach(function (o, oi) {
           var ob = el("button", "op-flip-opt", { type: "button", text: o });
+          // 정답 보기: 알맞은 보기(index 0) 오른쪽에 작은 표시
+          if (st.answers && oi === 0) ob.appendChild(el("span", "op-flip-ans", { text: "✓ 알맞은 답" }));
           ob.addEventListener("click", function (e) { e.stopPropagation(); st.flip[ci] = oi; render(); fire(); });
           opts.appendChild(ob);
         });
@@ -464,6 +500,13 @@
       sent.appendChild(makeBlank(1));
       sent.appendChild(document.createTextNode(D.sentence.after));
       box.appendChild(sent);
+
+      // 정답 보기: 문장 상자 아래 한 줄로 알맞은 답
+      if (st.answers) {
+        box.appendChild(el("div", "op-drag-ans", {
+          text: "알맞은 답: " + D.blanks[0].answer + ", " + D.blanks[1].answer,
+        }));
+      }
 
       var words = el("div", "op-words");
       D.words.forEach(function (w) {
@@ -633,6 +676,7 @@
         backdrop = null;
       }
       updateChrome();
+      renderMemo();
       onFullscreen(on);
     }
 
@@ -652,6 +696,15 @@
     return {
       getValue: getValue,
       setValue: function (v) { applyValue(v, false); },
+      // 교사 정답 보기: 저울 판을 다시 불러오지 않고 표시만 켜고 끈다(풀던 상태 유지)
+      setAnswers: function (on) {
+        on = !!on;
+        if (on === st.answers) return;
+        st.answers = on;
+        if (!on) st.memoOpen = false;
+        render();
+      },
+      getAnswers: function () { return st.answers; },
       destroy: function () {
         document.removeEventListener("keydown", onKey);
         hideTyping();

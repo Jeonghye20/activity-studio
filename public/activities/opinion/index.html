@@ -43,6 +43,9 @@
       if (q) initial = JSON.parse(q);
     } catch (e) {}
 
+    // 주소 ?answers=1 → 정답 보기를 켠 채 시작(단독 확인용)
+    var startAnswers = new URLSearchParams(location.search).get("answers") === "1";
+
     var inst = OpinionScale.mount(document.getElementById("app"), {
       content: content,
       value: initial,
@@ -56,11 +59,44 @@
         if (!on) setTimeout(reportHeight, 50);
       },
       onNavigate: function () {
-        // 화면이 바뀌면 판의 맨 위가 보이도록 부드럽게 스크롤한 뒤 타이핑이 시작된다
-        if (embedded) toParent({ type: "opinion:scrollIntoView" });
-        else { var b = document.querySelector(".op-board"); if (b) b.scrollIntoView({ behavior: "smooth", block: "start" }); }
+        // 단계가 바뀌면 저울 판 제목 줄(.op-head)이 화면 맨 위에 오도록 스크롤한다.
+        // 교사용 메모 띠가 접혀 있든 펼쳐 있든 저울 판이 맨 위에 온다.
+        if (!embedded) {
+          var b = document.querySelector(".op-board");
+          if (b) b.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+        // 끼운 화면: 정답 보기가 켜져 메모 띠가 있으면 저울 판 제목 줄까지 스크롤.
+        // 네이티브 scrollIntoView 는 같은 출처 iframe 에서 부모의 스크롤 컨테이너까지
+        // 거슬러 스크롤하고, 포커스 자동 스크롤·메모 높이 변화와도 싸우지 않는다.
+        // 맨 위에서 16px 아래 여백은 .op-head 의 scroll-margin-top 으로 준다.
+        var done = false;
+        if (inst && inst.getAnswers && inst.getAnswers()) {
+          var head = document.querySelector(".op-head");
+          if (head && head.scrollIntoView) {
+            // 바로 한 번 맞춰 화면을 올린다
+            setTimeout(function () { try { head.scrollIntoView({ block: "start", behavior: "smooth" }); } catch (e) {} }, 60);
+            // 타이핑 연출(.op-typing)이 떠 있는 동안은 높이가 출렁여 스크롤이 어긋난다.
+            // 연출이 사라져 높이가 정착한 뒤 한 번 더 정확히 맞춘다(scrollIntoView 는 멱등).
+            var tries = 0;
+            (function settle() {
+              tries++;
+              if (document.querySelector(".op-typing") && tries < 30) { setTimeout(settle, 100); return; }
+              requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                  try { head.scrollIntoView({ block: "start", behavior: "auto" }); } catch (e) {}
+                });
+              });
+            })();
+            done = true;
+          }
+        }
+        // 정답 보기가 꺼져 있으면(메모 없음) 지금과 같은 동작: 부모가 iframe 을 맨 위로
+        if (!done) toParent({ type: "opinion:scrollIntoView" });
       },
     });
+
+    if (startAnswers) inst.setAnswers(true);
 
     // 판 높이에 맞춰 끼운 자리 높이를 알린다 (스크롤 막대 없이)
     function reportHeight() {
@@ -80,6 +116,7 @@
     window.addEventListener("message", function (e) {
       var d = e.data || {};
       if (d.type === "opinion:set") inst.setValue(d.value);
+      else if (d.type === "repair:answers") inst.setAnswers(!!d.on);
       else if (d.type === "opinion:get" && e.source) {
         e.source.postMessage({ type: "opinion:value", value: inst.getValue() }, "*");
       }
