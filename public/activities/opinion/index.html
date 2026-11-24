@@ -30,6 +30,12 @@
 
     if (embedded) document.documentElement.classList.add("embedded");
 
+    // 내용 세트: ?set=<이름> (없으면 기본 = 얼굴 인식 출석)
+    var setName = new URLSearchParams(location.search).get("set");
+    var content =
+      (setName && window.OPINION_CONTENTS && window.OPINION_CONTENTS[setName]) ||
+      window.OPINION_CONTENT;
+
     // 처음 값: ?value=<JSON>
     var initial = null;
     try {
@@ -38,7 +44,7 @@
     } catch (e) {}
 
     var inst = OpinionScale.mount(document.getElementById("app"), {
-      content: window.OPINION_CONTENT,
+      content: content,
       value: initial,
       onChange: function (value) {
         toParent({ type: "opinion:change", value: value });
