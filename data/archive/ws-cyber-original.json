@@ -1,23 +1,7 @@
 {
+  "note": "ws-cyber 원본('단톡방에서 생긴 일') 5문항(s1,t1,t2,t3,w1). 의견 저울 하나로 교체하며 보관. 종이용 원본 data/sheets/Ⅴ-2-01_ws-cyber.json 은 삭제함.",
   "id": "ws-cyber",
-  "unit": "Ⅴ-2-01",
-  "title": "단톡방에서 생긴 일",
-  "type": "discussion",
-  "minutes": 45,
-  "mode": [
-    "온라인",
-    "종이"
-  ],
-  "goal": "사이버 폭력의 심각성을 알고, 사이버 폭력에 대응하는 방안을 세울 수 있다.",
-  "keywords": [
-    "사이버 폭력",
-    "디지털 윤리",
-    "단톡방",
-    "방관자"
-  ],
-  "situations": [
-    "focus"
-  ],
+  "wrapOn": true,
   "sections": [
     {
       "role": "start",
@@ -168,6 +152,5 @@
         }
       ]
     }
-  ],
-  "wrapOn": true
+  ]
 }
