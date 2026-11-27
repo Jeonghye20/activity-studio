@@ -53,7 +53,7 @@ export default function LandingPage() {
           textAlign: 'center',
           lineHeight: 1.15,
         }}>
-          수업활동 스튜디오
+          콕정보랩
         </h1>
 
         <p style={{

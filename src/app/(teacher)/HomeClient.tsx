@@ -6,8 +6,11 @@ import type { WorksheetSummary } from '@/types/worksheet';
 import TypeCover from '@/components/TypeCover';
 import TypeTag from '@/components/TypeTag';
 import { type TypeKey } from '@/lib/types';
-import HomeFilterBar, { type FilterValues } from '@/components/HomeFilterBar';
-import { RECENT_IDS, SPEC_IDS } from '@/lib/homeLists';
+import HomeSchoolTabs from '@/components/HomeSchoolTabs';
+import { RECENT_IDS } from '@/lib/homeLists';
+
+/* ── 인공지능 활동지 (활동지 찾기에 있는 활동지, 이 순서로) ── */
+const AI_IDS = ['ws-ai-ethics', 'ws-review', 'ws-ai-escape', 'ws-learning-data'] as const;
 
 /* ── 범위 설정 ── */
 const SCOPE_KEY = 'activity_studio_scope';
@@ -325,7 +328,6 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
   const [loading,      setLoading]      = useState(false);
   const [scope,        setScope]        = useState<ScopeConfig>(DEFAULT_SCOPE);
   const [showSetup,    setShowSetup]    = useState(false);
-  const [filterKey,    setFilterKey]    = useState(0);
   const inputRef   = useRef<HTMLInputElement>(null);
 
   /* localStorage 로드 */
@@ -381,16 +383,11 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
     localStorage.removeItem(SCOPE_KEY);
     setScope(DEFAULT_SCOPE);
     setShowSetup(true);
-    setFilterKey(k => k + 1);
-  }
-
-  function handleFilterChange(values: FilterValues) {
-    setScope(prev => ({ ...prev, school: values.school, subject: values.subject }));
   }
 
   /* 섹션용 데이터 */
   const recent     = (RECENT_IDS as readonly string[]).map(id => worksheets.find(w => w.id === id)).filter(Boolean).slice(0, 4) as WorksheetSummary[];
-  const specialized= (SPEC_IDS as readonly string[]).map(id => worksheets.find(w => w.id === id)).filter(Boolean).slice(0, 4) as WorksheetSummary[];
+  const aiSheets   = (AI_IDS as readonly string[]).map(id => worksheets.find(w => w.id === id)).filter(Boolean) as WorksheetSummary[];
   const shared     = worksheets.filter(w => w.type === 'concept').slice(0, 4);
   return (
     <>
@@ -452,7 +449,7 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
               {isInfoScope(scope) && (
                 <>
                   <div style={{ flexBasis: '100%', height: 0 }} aria-hidden="true" />
-                  <span className="hero-label">정보 추천</span>
+                  <span className="hero-label">자주 찾는 주제</span>
                   {SUBJECT_CHIPS.map(c => (
                     <button
                       key={c.id} type="button" className="sit"
@@ -477,14 +474,9 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
           </div>
         </section>
 
-        {/* ── 필터 줄 ── */}
+        {/* ── 필터 줄 (학교급 탭) ── */}
         <div style={{ marginTop: 18 }}>
-          <HomeFilterBar
-            key={filterKey}
-            initialSchool={scope.school}
-            initialSubject={scope.subject}
-            onChange={handleFilterChange}
-          />
+          <HomeSchoolTabs />
         </div>
 
         {/* ── 검색 결과 ── */}
@@ -554,30 +546,24 @@ export default function HomeClient({ worksheets, unitMap }: Props) {
           </div>
         </section>
 
-        {/* ── 정보 특화 활동지 ── */}
-        <section className="sec sec-box" aria-labelledby="sec-spec">
+        {/* ── 인공지능 활동지 ── */}
+        <section className="sec sec-box" aria-labelledby="sec-ai">
           <SectionHead
-            id="sec-spec"
-            title={isInfoScope(scope) ? '정보 특화 활동지' : `${scope.subject} 특화 활동지`}
-            sub={isInfoScope(scope) ? '정보 수업에서 자주 쓰는 게임형 활동이에요.' : '이 과목 활동지는 준비 중이에요.'}
-            href="/browse?from=spec"
+            id="sec-ai"
+            title="인공지능 활동지"
+            sub="인공지능 단원 수업에 바로 쓰는 활동이에요."
+            href="/browse?from=ai"
             icon={
               <div style={{ width: 40, height: 40, borderRadius: 11, background: 'linear-gradient(135deg,#ede9fe,#ddd6fe)', display: 'grid', placeItems: 'center' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
             }
           />
-          {isInfoScope(scope) ? (
-            <div className="ws-grid4">
-              {specialized.map(w => (
-                <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} isPreparing={!EXCLUDE_IDS.includes(w.id)} />
-              ))}
-            </div>
-          ) : (
-            <div style={{ padding: '40px 24px', textAlign: 'center', background: 'var(--surface)', borderRadius: 14, border: '1px dashed var(--line)', fontSize: 14, color: 'var(--ink-3)' }}>
-              {scope.subject} 활동지는 준비 중이에요.
-            </div>
-          )}
+          <div className="ws-grid4">
+            {aiSheets.map(w => (
+              <WsCard key={w.id} sheet={w} unitTitle={unitMap[w.unit]} />
+            ))}
+          </div>
         </section>
 
         {/* ── 선생님들이 공유한 활동 ── */}

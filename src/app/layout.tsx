@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: '수업활동 스튜디오',
+  title: '콕정보랩',
   description: '중학교 정보 수업 활동지 플랫폼',
 };
 
