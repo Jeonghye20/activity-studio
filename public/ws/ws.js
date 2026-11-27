@@ -587,10 +587,16 @@
       const textCol = h('div');
       textCol.append(h('h1', null, sheet.title));
       textCol.append(h('div', { class: 'goal' }, [h('b', null, '학습목표'), sheet.goal]));
-      const heroFit = sheet.heroFit === 'contain' ? 'contain' : 'cover';
-      const heroDiv = h('div', { class: 'ws-hero', style: 'overflow:hidden;align-self:stretch;padding:' + (heroFit === 'contain' ? '12px' : '0') });
-      heroDiv.append(h('img', { src: sheet.heroImg, alt: sheet.heroAlt || '', style: 'width:100%;height:100%;min-height:160px;object-fit:' + heroFit + ';display:block' }));
-      headKids.push(h('div', { class: 'ws-intro' }, [textCol, heroDiv]));
+      if (sheet.heroFit === 'contain') {
+        // 센서(heroArt)와 같은 크기: 기본 .ws-hero 그대로 + 180×130 img
+        const heroDiv = h('div', { class: 'ws-hero' });
+        heroDiv.append(h('img', { src: sheet.heroImg, alt: sheet.heroAlt || '', style: 'width:180px;height:130px;max-width:100%;object-fit:contain;display:block' }));
+        headKids.push(h('div', { class: 'ws-intro' }, [textCol, heroDiv]));
+      } else {
+        const heroDiv = h('div', { class: 'ws-hero', style: 'overflow:hidden;align-self:stretch;padding:0' });
+        heroDiv.append(h('img', { src: sheet.heroImg, alt: sheet.heroAlt || '', style: 'width:100%;height:100%;min-height:160px;object-fit:cover;display:block' }));
+        headKids.push(h('div', { class: 'ws-intro' }, [textCol, heroDiv]));
+      }
     } else if (sheet.heroArt != null && DEVICE_ART[sheet.heroArt]) {
       const textCol = h('div');
       textCol.append(h('h1', null, sheet.title));
