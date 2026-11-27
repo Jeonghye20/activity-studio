@@ -128,6 +128,11 @@ export default function PreviewClient({ sheet, units }: Props) {
   const isGame = GAME_TYPES.includes(sheet.type) || hasGameSrc;
   const visibleSections = sheet.sections.filter(s => s.role !== 'wrap' || sheet.wrapOn !== false);
 
+  // 끼운 활동(의견 저울·뉴스룸·수리 센터)은 판 안에서 정답 보기를 따로 그리므로 띠를 넣지 않는다
+  const isEmbedActivity = sheet.sections.some(s =>
+    (s.blocks as Record<string, unknown>[]).some(b => b.kind === 'embed')
+  );
+
   return (
     <div className="p-main">
 
@@ -253,6 +258,17 @@ export default function PreviewClient({ sheet, units }: Props) {
               {renderAnswerSwitch()}
             </div>
           </div>
+
+          {/* 정답 보기 안내 띠 (끼운 활동 제외) */}
+          {showAnswers && !isEmbedActivity && (
+            <div style={{
+              background: '#fff3bf', border: '1px solid #ffd43b', color: '#6b4d00',
+              fontSize: 14, fontWeight: 700, borderRadius: 12, padding: '12px 16px',
+              margin: '18px 0 0', wordBreak: 'keep-all',
+            }}>
+              정답 보기 중입니다. 학생 화면에는 보이지 않습니다.
+            </div>
+          )}
 
           {/* 본문: 활동지. 끼운 모듈이 정답 보기를 맡는 경우 ws.js 를 다시 그리지 않게 showAnswers 고정 */}
           <div className="pv-paper">

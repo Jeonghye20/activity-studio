@@ -55,15 +55,19 @@ interface BlockProps<V = unknown> {
 
 function ChoiceBlock({ block, savedValue, onAnswer }: BlockProps<number>) {
   const options = (block.options as string[]) ?? [];
-  const isCol = options.some(o => o.length > 14);
+  const img = (block as unknown as { img?: string }).img;
+  const imgAlt = (block as unknown as { imgAlt?: string }).imgAlt;
+  const imgSide = !!(block as unknown as { imgSide?: boolean }).imgSide;
+  const isCol = imgSide || options.some(o => o.length > 14);
   const [selected, setSelected] = useState<number | null>(() =>
     typeof savedValue === 'number' ? savedValue : null
   );
   function pick(i: number) { setSelected(i); onAnswer(i); }
-  return (
+
+  const optionsEl = (
     <div style={
       isCol
-        ? { display: 'flex', flexDirection: 'column', gap: 8 }
+        ? { display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }
         : { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }
     }>
       {options.map((opt, i) => {
@@ -97,6 +101,24 @@ function ChoiceBlock({ block, savedValue, onAnswer }: BlockProps<number>) {
       })}
     </div>
   );
+
+  if (img) {
+    return imgSide ? (
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+        <div style={{ width: 200, flexShrink: 0 }}>
+          <img src={img} alt={imgAlt || ''} style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 16 }} />
+        </div>
+        {optionsEl}
+      </div>
+    ) : (
+      <div>
+        <img src={img} alt={imgAlt || ''} style={{ display: 'block', width: '100%', maxWidth: 520, height: 'auto', margin: '0 auto 12px', borderRadius: 16 }} />
+        {optionsEl}
+      </div>
+    );
+  }
+
+  return optionsEl;
 }
 
 function WriteBlock({ block, savedValue, onAnswer }: BlockProps<string>) {
@@ -233,6 +255,9 @@ const DEVICE_ART_SVG = [
 
 function DeviceCardBlock({ block, savedValue, onAnswer }: BlockProps<Record<string, string>>) {
   const rows = (block.rows as Array<[string, ...{ answer: string; options: string[] }[]]>) ?? [];
+  const b = block as unknown as { columns?: string[]; rowImgs?: string[]; rowNotes?: string[] };
+  const useImg = Array.isArray(b.rowImgs);
+  const columns = b.columns ?? [];
   const [sel, setSel] = useState<Record<string, string>>(() => {
     if (savedValue && typeof savedValue === 'object' && !Array.isArray(savedValue)) {
       return savedValue as Record<string, string>;
@@ -247,22 +272,26 @@ function DeviceCardBlock({ block, savedValue, onAnswer }: BlockProps<Record<stri
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${rows.length}, 1fr)`, gap: 14 }}>
       {rows.map((row, ri) => {
         const name = row[0] as string;
         const cells = row.slice(1) as { answer: string; options: string[] }[];
-        const labels = ['입력(센서)', '출력'];
+        const note = b.rowNotes?.[ri];
         return (
-          <div key={ri} style={{ background: '#f8f9fb', borderRadius: 14, overflow: 'hidden', border: '1px solid #e3e7ef' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }} dangerouslySetInnerHTML={{ __html: DEVICE_ART_SVG[ri] ?? '' }} />
-            <div style={{ padding: '10px 14px 16px' }}>
-              <p style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 800, color: '#172036' }}>{name}</p>
+          <div key={ri} style={{ background: '#f8f9fb', borderRadius: 14, overflow: 'hidden', border: '1px solid #e3e7ef', ...(useImg ? { display: 'flex', flexDirection: 'column' } : {}) }}>
+            {useImg
+              ? <div style={{ textAlign: 'center', padding: '12px 0 0' }}><img src={b.rowImgs![ri]} alt={name} style={{ height: 120, maxWidth: 180, objectFit: 'contain', display: 'inline-block' }} /></div>
+              : <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }} dangerouslySetInnerHTML={{ __html: DEVICE_ART_SVG[ri] ?? '' }} />}
+            <div style={{ padding: '10px 14px 16px', ...(useImg ? { display: 'flex', flexDirection: 'column', flex: 1 } : {}) }}>
+              <p style={{ margin: useImg ? '0 0 6px' : '0 0 12px', fontSize: 15, fontWeight: 800, color: '#172036', ...(useImg ? { textAlign: 'center' as const } : {}) }}>{name}</p>
+              {note && <p style={{ margin: '0 0 10px', fontSize: 13, color: '#5d6880', textAlign: 'center', wordBreak: 'keep-all', lineHeight: 1.4, minHeight: '2.8em' }}>{note}</p>}
               {cells.map((cell, ci) => {
                 const k = `${ri}-${ci}`;
                 const v = sel[k] ?? '';
+                const label = useImg ? (columns[1] ?? '') : ['입력(센서)', '출력'][ci];
                 return (
-                  <div key={ci} style={{ marginBottom: ci < cells.length - 1 ? 10 : 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#5d6880', marginBottom: 4 }}>{labels[ci]}</div>
+                  <div key={ci} style={{ marginTop: useImg && ci === 0 ? 'auto' : undefined, marginBottom: ci < cells.length - 1 ? 10 : 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#5d6880', marginBottom: 4 }}>{label}</div>
                     <select
                       value={v}
                       onChange={e => pick(ri, ci, e.target.value)}

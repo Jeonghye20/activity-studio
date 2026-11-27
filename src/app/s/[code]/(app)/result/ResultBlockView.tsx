@@ -89,11 +89,13 @@ function tone(isPicked: boolean, isRight: boolean, showAnswer: boolean) {
 /* ── 객관식 ────────────────────────────────────────────── */
 function ChoiceView({ block, ans, showAnswer }: { block: Block; ans: Answer; showAnswer: boolean }) {
   const options = (block.options as string[]) ?? [];
-  const isCol = options.some(o => o.length > 14);
-  const answer = (block as unknown as { answer: number }).answer;
-  return (
+  const bb = block as unknown as { answer: number; img?: string; imgAlt?: string; imgSide?: boolean };
+  const imgSide = !!bb.imgSide;
+  const isCol = imgSide || options.some(o => o.length > 14);
+  const answer = bb.answer;
+  const optsEl = (
     <div style={isCol
-      ? { display: 'flex', flexDirection: 'column', gap: 8 }
+      ? { display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }
       : { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
       {options.map((opt, i) => {
         const t = tone(ans === i, i === answer, showAnswer);
@@ -111,6 +113,22 @@ function ChoiceView({ block, ans, showAnswer }: { block: Block; ans: Answer; sho
       })}
     </div>
   );
+  if (bb.img) {
+    return imgSide ? (
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+        <div style={{ width: 200, flexShrink: 0 }}>
+          <img src={bb.img} alt={bb.imgAlt || ''} style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 16 }} />
+        </div>
+        {optsEl}
+      </div>
+    ) : (
+      <div>
+        <img src={bb.img} alt={bb.imgAlt || ''} style={{ display: 'block', width: '100%', maxWidth: 520, height: 'auto', margin: '0 auto 12px', borderRadius: 16 }} />
+        {optsEl}
+      </div>
+    );
+  }
+  return optsEl;
 }
 
 function NumCircle({ n, bg, square }: { n: number; bg: string; square?: boolean }) {
@@ -129,8 +147,9 @@ function MultiView({ block, ans, showAnswer }: { block: Block; ans: Answer; show
   const options = (block.options as string[]) ?? [];
   const answer = ((block as unknown as { answer: number[] }).answer) ?? [];
   const picked = Array.isArray(ans) ? (ans as number[]) : [];
-  return (
-    <div style={{ background: '#f1f3f7', borderRadius: 14, padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+  const bb = block as unknown as { img?: string; imgAlt?: string; imgSide?: boolean };
+  const boxEl = (
+    <div style={{ background: '#f1f3f7', borderRadius: 14, padding: 10, display: 'flex', flexDirection: 'column', gap: 8, flex: bb.imgSide ? 1 : undefined }}>
       {options.map((opt, i) => {
         const t = tone(picked.includes(i), answer.includes(i), showAnswer);
         return (
@@ -147,6 +166,22 @@ function MultiView({ block, ans, showAnswer }: { block: Block; ans: Answer; show
       })}
     </div>
   );
+  if (bb.img) {
+    return bb.imgSide ? (
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+        <div style={{ width: 200, flexShrink: 0 }}>
+          <img src={bb.img} alt={bb.imgAlt || ''} style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 16 }} />
+        </div>
+        {boxEl}
+      </div>
+    ) : (
+      <div>
+        <img src={bb.img} alt={bb.imgAlt || ''} style={{ display: 'block', width: '100%', maxWidth: 520, height: 'auto', margin: '0 auto 12px', borderRadius: 16 }} />
+        {boxEl}
+      </div>
+    );
+  }
+  return boxEl;
 }
 
 /* ── 표 채우기 (장치 카드 / 일반 표) ───────────────────── */
@@ -175,31 +210,37 @@ function ValueBox({ value, right, showAnswer }: { value?: string; right: string;
 }
 
 function TableView({ block, ans, showAnswer }: { block: Block; ans: Answer; showAnswer: boolean }) {
-  const b = block as unknown as { rows: Array<[string, ...Cell[]]>; columns: string[]; deviceCard?: boolean };
+  const b = block as unknown as { rows: Array<[string, ...Cell[]]>; columns: string[]; deviceCard?: boolean; rowImgs?: string[]; rowNotes?: string[] };
   const rows = b.rows ?? [];
   const a = (ans && typeof ans === 'object' ? ans : {}) as Record<string, string | number>;
 
   if (b.deviceCard) {
     const labels = (b.columns ?? []).slice(1);
+    const useImg = Array.isArray(b.rowImgs);
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
-        {rows.map((row, ri) => (
-          <div key={ri} style={{ background: '#f5f6f9', borderRadius: 12, border: '1px solid #e3e7ef', overflow: 'hidden' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 0' }}
-              dangerouslySetInnerHTML={{ __html: DEVICE_ART_SVG[ri] ?? '' }} />
-            <div style={{ padding: '6px 14px 16px' }}>
-              <p style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: INK, textAlign: 'center' }}>{row[0] as string}</p>
-              {(row.slice(1) as Cell[]).map((cell, ci) => (
-                <div key={ci} style={{ marginBottom: ci < row.length - 2 ? 10 : 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#5d6880', marginBottom: 4 }}>
-                    {(labels[ci] ?? '').replace(' (', '(')}
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${rows.length}, 1fr)`, gap: 14 }}>
+        {rows.map((row, ri) => {
+          const note = b.rowNotes?.[ri];
+          return (
+            <div key={ri} style={{ background: '#f5f6f9', borderRadius: 12, border: '1px solid #e3e7ef', overflow: 'hidden', ...(useImg ? { display: 'flex', flexDirection: 'column' } : {}) }}>
+              {useImg
+                ? <div style={{ textAlign: 'center', padding: '12px 0 0' }}><img src={b.rowImgs![ri]} alt={row[0] as string} style={{ height: 120, maxWidth: 180, objectFit: 'contain', display: 'inline-block' }} /></div>
+                : <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 0' }} dangerouslySetInnerHTML={{ __html: DEVICE_ART_SVG[ri] ?? '' }} />}
+              <div style={{ padding: '6px 14px 16px', ...(useImg ? { display: 'flex', flexDirection: 'column', flex: 1 } : {}) }}>
+                <p style={{ margin: useImg ? '0 0 6px' : '0 0 12px', fontSize: 15, fontWeight: 700, color: INK, textAlign: 'center' }}>{row[0] as string}</p>
+                {note && <p style={{ margin: '0 0 10px', fontSize: 13, color: '#5d6880', textAlign: 'center', wordBreak: 'keep-all', lineHeight: 1.4, minHeight: '2.8em' }}>{note}</p>}
+                {(row.slice(1) as Cell[]).map((cell, ci) => (
+                  <div key={ci} style={{ marginTop: useImg && ci === 0 ? 'auto' : undefined, marginBottom: ci < row.length - 2 ? 10 : 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#5d6880', marginBottom: 4 }}>
+                      {(labels[ci] ?? '').replace(' (', '(')}
+                    </div>
+                    <ValueBox value={cellValue(cell, a[`${ri}-${ci}`])} right={cell.answer} showAnswer={showAnswer} />
                   </div>
-                  <ValueBox value={cellValue(cell, a[`${ri}-${ci}`])} right={cell.answer} showAnswer={showAnswer} />
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   }
@@ -236,15 +277,18 @@ function OrderView({ block, ans, showAnswer }: { block: Block; ans: Answer; show
   const v = ans as { items?: number[]; touched?: boolean } | undefined;
   const answered = !!(v && Array.isArray(v.items) && v.touched);
   const order = answered ? v!.items! : start;
-  const hasPanel = !!(block as unknown as { panelArt?: number }).panelArt;
+  const pb = block as unknown as { panelArt?: number; panelImg?: string; panelAlt?: string; panelNote?: string };
+  const hasPanel = !!pb.panelArt || !!pb.panelImg;
 
   return (
     <div style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
       {hasPanel && (
-        <div style={{ width: 140, flexShrink: 0, background: '#f5f6f9', borderRadius: 12, padding: '10px 8px', alignSelf: 'flex-start' }}>
-          <div dangerouslySetInnerHTML={{ __html: PANEL_ART_SVG }} />
+        <div style={{ width: pb.panelImg ? 190 : 140, flexShrink: 0, background: '#f5f6f9', borderRadius: 12, padding: '10px 8px', alignSelf: 'flex-start' }}>
+          {pb.panelImg
+            ? <img src={pb.panelImg} alt={pb.panelAlt || ''} style={{ width: '100%', display: 'block', borderRadius: 8 }} />
+            : <div dangerouslySetInnerHTML={{ __html: PANEL_ART_SVG }} />}
           <p style={{ margin: '6px 0 0', fontSize: 12, color: '#5d6880', lineHeight: 1.5, textAlign: 'center', wordBreak: 'keep-all' }}>
-            {String(block.hint ?? '센서에서 시작된 신호는 어디로 갈까요?')}
+            {pb.panelImg ? (pb.panelNote || '') : String(block.hint ?? '센서에서 시작된 신호는 어디로 갈까요?')}
           </p>
         </div>
       )}

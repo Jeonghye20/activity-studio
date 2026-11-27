@@ -19,6 +19,9 @@ const PANEL_ART_SVG = `<svg viewBox="0 0 220 160" style="width:100%;display:bloc
 export default function OrderBlock({ block, savedValue, onAnswer }: Props) {
   const items = (block.items as string[]) ?? [];
   const startIndices = (block.start as number[]) ?? items.map((_, i) => i);
+  const panelImg = (block as unknown as { panelImg?: string }).panelImg;
+  const panelAlt = (block as unknown as { panelAlt?: string }).panelAlt;
+  const panelNote = (block as unknown as { panelNote?: string }).panelNote;
 
   const [order, setOrder] = useState<number[]>(() => {
     if (savedValue && typeof savedValue === 'object' && !Array.isArray(savedValue)) {
@@ -52,9 +55,11 @@ export default function OrderBlock({ block, savedValue, onAnswer }: Props) {
         background: '#f7f8fb', borderRadius: 16, overflow: 'hidden',
         display: 'flex', flexDirection: 'column',
       }}>
-        <div dangerouslySetInnerHTML={{ __html: PANEL_ART_SVG }} />
-        <p style={{ margin: 0, padding: '8px 12px', fontSize: 12, color: '#5d6880', lineHeight: 1.5, textAlign: 'center' }}>
-          센서에서 시작된 신호는 어디로 갈까요?
+        {panelImg
+          ? <img src={panelImg} alt={panelAlt || ''} style={{ width: '100%', display: 'block' }} />
+          : <div dangerouslySetInnerHTML={{ __html: PANEL_ART_SVG }} />}
+        <p style={{ margin: 0, padding: '8px 12px', fontSize: 12, color: '#5d6880', lineHeight: 1.5, textAlign: 'center', wordBreak: 'keep-all' }}>
+          {panelImg ? (panelNote || '') : '센서에서 시작된 신호는 어디로 갈까요?'}
         </p>
       </div>
 

@@ -27,13 +27,15 @@ export default function MultiBlock({ block, savedValue, onAnswer }: Props) {
     onAnswer(next);
   }
 
-  const isCol = options.some(o => o.length > 14);
+  const img = (block as unknown as { img?: string }).img;
+  const imgAlt = (block as unknown as { imgAlt?: string }).imgAlt;
+  const imgSide = !!(block as unknown as { imgSide?: boolean }).imgSide;
+  const isCol = imgSide || options.some(o => o.length > 14);
 
-  return (
-    <div>
+  const optionsEl = (
       <div style={
         isCol
-          ? { display: 'flex', flexDirection: 'column', gap: 8 }
+          ? { display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }
           : { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }
       }>
         {options.map((opt, i) => {
@@ -68,6 +70,23 @@ export default function MultiBlock({ block, savedValue, onAnswer }: Props) {
           );
         })}
       </div>
-    </div>
   );
+
+  if (img) {
+    return imgSide ? (
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+        <div style={{ width: 200, flexShrink: 0 }}>
+          <img src={img} alt={imgAlt || ''} style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 16 }} />
+        </div>
+        {optionsEl}
+      </div>
+    ) : (
+      <div>
+        <img src={img} alt={imgAlt || ''} style={{ display: 'block', width: '100%', maxWidth: 520, height: 'auto', margin: '0 auto 12px', borderRadius: 16 }} />
+        {optionsEl}
+      </div>
+    );
+  }
+
+  return <div>{optionsEl}</div>;
 }

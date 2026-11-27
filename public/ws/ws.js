@@ -54,7 +54,8 @@
 
   C.choice = function (b, ctx, multi) {
     const sel = new Set();
-    const wrap = h('div', { class: 'opts' + (multi ? ' multi' : '') + (b.options.some(o => o.length > 14) ? ' col' : '') });
+    const forceCol = b.imgSide || b.options.some(o => o.length > 14);
+    const wrap = h('div', { class: 'opts' + (multi ? ' multi' : '') + (forceCol ? ' col' : '') });
     const btns = b.options.map((o, i) => {
       const bt = h('button', { class: 'opt' + (multi ? ' sq' : ''), type: 'button', 'aria-pressed': 'false', onclick: () => {
         if (multi) { sel.has(i) ? sel.delete(i) : sel.add(i); }
@@ -65,8 +66,16 @@
       return bt;
     });
     btns.forEach(x => wrap.append(x));
+    // 문항 그림(img): imgSide 면 왼쪽 그림 + 오른쪽 보기, 아니면 보기 위 그림
+    let el = wrap;
+    if (b.img) {
+      const img = h('img', { class: 'opt-img', src: b.img, alt: b.imgAlt || '' });
+      el = b.imgSide
+        ? h('div', { class: 'opts-side' }, [h('div', { class: 'opts-side-img' }, img), wrap])
+        : h('div', { class: 'opts-top' }, [img, wrap]);
+    }
     return {
-      el: wrap,
+      el: el,
       answered: () => sel.size > 0,
       check: () => multi ? eqSet([...sel], b.answer) : sel.has(b.answer),
       reveal: () => [].concat(b.answer).forEach(i => btns[i].classList.add('is-ans'))
@@ -93,18 +102,22 @@
     if (b.deviceCard) {
       // 장치 카드 레이아웃 (deviceCard: true 플래그)
       const cells = [];
-      const grid = h('div', { class: 'ws-devices' });
+      const useImg = Array.isArray(b.rowImgs);
+      const grid = h('div', { class: 'ws-devices' + (b.rows.length === 4 ? ' cols-4' : '') });
       b.rows.forEach((row, ri) => {
-        const card = h('div', { class: 'ws-device' });
-        if (DEVICE_ART[ri]) {
+        const card = h('div', { class: 'ws-device' + (useImg ? ' img' : '') });
+        if (useImg && b.rowImgs[ri]) {
+          card.append(h('img', { class: 'ws-device-img', src: b.rowImgs[ri], alt: row[0] }));
+        } else if (DEVICE_ART[ri]) {
           const artWrap = h('div', { class: 'ws-device-art' });
           artWrap.innerHTML = DEVICE_ART[ri];
           card.append(artWrap);
         }
         card.append(h('h3', { class: 'ws-device-name' }, row[0]));
+        if (b.rowNotes && b.rowNotes[ri]) card.append(h('p', { class: 'ws-device-note' }, b.rowNotes[ri]));
         row.slice(1).forEach((c, ci) => {
           if (typeof c !== 'object') return;
-          const lbl = ci === 0 ? '입력(센서)' : '출력';
+          const lbl = useImg ? (b.columns[1] || '') : (ci === 0 ? '입력(센서)' : '출력');
           const inp = c.options
             ? h('select', { onchange: ctx.changed, 'aria-label': row[0] + ' ' + lbl },
                 [h('option', { value: '' }, '선택')].concat(c.options.map(o => h('option', { value: o }, o))))
@@ -428,12 +441,13 @@
     let touched = false;
     function mv(p, d) { const q = p + d; [cur[p], cur[q]] = [cur[q], cur[p]]; touched = true; paint(q); ctx.changed(); const btn = els[q].querySelectorAll('.ob button')[d < 0 ? 0 : 1]; if (btn && !btn.disabled) btn.focus(); }
     paint();
-    if (b.panelArt != null && DEVICE_ART[b.panelArt]) {
-      const panel = h('div', { class: 'ws-pot-panel' });
-      panel.innerHTML = DEVICE_ART[b.panelArt];
-      panel.append(h('small', null, '센서에서 시작된 신호는 어디로 갈까요?'));
+    if (b.panelImg || (b.panelArt != null && DEVICE_ART[b.panelArt])) {
+      const panel = h('div', { class: 'ws-pot-panel' + (b.panelImg ? ' img' : '') });
+      if (b.panelImg) panel.append(h('img', { class: 'ws-panel-img', src: b.panelImg, alt: b.panelAlt || '' }));
+      else panel.innerHTML = DEVICE_ART[b.panelArt];
+      panel.append(h('small', null, b.panelNote || '센서에서 시작된 신호는 어디로 갈까요?'));
       return {
-        el: h('div', { class: 'ws-order-area' }, [panel, list]),
+        el: h('div', { class: 'ws-order-area' + (b.panelImg ? ' img' : '') }, [panel, list]),
         answered: () => touched,
         check: () => cur.every((v, i) => v === i),
         reveal: () => { cur = b.items.map((_, i) => i); paint(); els.forEach(x => x.classList.add('is-ans')); }
