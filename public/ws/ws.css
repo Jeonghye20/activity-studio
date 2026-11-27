@@ -62,6 +62,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .opt[aria-pressed=true]{background:var(--sel);border-color:var(--navy);color:var(--navy2)}
 .opt[aria-pressed=true] .mk{background:var(--navy);border-color:var(--navy);color:#fff}
 .opt.is-ans{box-shadow:inset 0 0 0 2px var(--good)}
+.ans-mode .opt.is-ans{box-shadow:inset 0 0 0 2px #2b8a3e;background:#ebfbee}
+.ans-mode .opt.is-ans::after{content:"✓ 정답";margin-left:auto;flex:none;font-size:13px;font-weight:800;color:#2b8a3e}
+/* 문항 그림 (choice/multi img, imgSide) */
+.opt-img{display:block;width:100%;max-width:520px;height:auto;margin:0 auto 12px;border-radius:16px}
+.opts-top{display:block}
+.opts-side{display:flex;gap:16px;align-items:center}
+.opts-side-img{width:200px;flex:none}
+.opts-side-img .opt-img{margin:0;max-width:100%}
+.opts-side .opts{flex:1;margin-top:0;background:none;padding:0;border-radius:0}
+@media(max-width:640px){.opts-side{flex-direction:column;align-items:stretch}.opts-side-img{width:100%;max-width:160px}}
 
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
 .btn{min-height:40px;padding:0 16px;border-radius:9px;border:1px solid var(--line);background:#fff;font-weight:700}
@@ -103,7 +113,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:center}
 .tbl th{background:var(--soft);font-weight:700;font-size:13px}
 .tbl input,.tbl select{width:100%;max-width:120px;min-height:36px;border:1px solid var(--line);border-radius:8px;text-align:center;font:inherit;background:#fff}
-.tbl .is-ans{border-color:var(--good);background:var(--goodbg)}
+.tbl .is-ans{border:2px solid #2b8a3e;background:#ebfbee;font-weight:700}
 .tbl td.wrong input,.tbl td.wrong select{border-color:var(--bad);background:var(--badbg)}
 
 /* fix sentence */
@@ -304,27 +314,34 @@ textarea{width:100%;min-height:84px;border:1px solid var(--line);border-radius:1
 
 /* device card table (deviceCard: true) */
 .ws-devices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px}
+.ws-devices.cols-4{grid-template-columns:repeat(4,1fr)}
 .ws-device{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px}
+.ws-device.img{display:flex;flex-direction:column}
 .ws-device-art svg{width:100%;height:88px;display:block}
+.ws-device-img{display:block;margin:0 auto 6px;height:120px;max-width:180px;object-fit:contain}
 .ws-device-name{font-size:14px;text-align:center;margin:6px 0 12px;font-weight:700}
+.ws-device-note{font-size:13px;color:#5d6880;text-align:center;word-break:keep-all;line-height:1.4;margin:4px 0 10px;min-height:2.8em}
+.ws-device.img .ws-dlabel{margin-top:auto}
 .ws-dlabel{display:block;font-size:12px;font-weight:700;color:var(--sub);margin:10px 0 4px}
 .ws-dlabel select,.ws-dlabel input{width:100%;display:block;min-height:38px;border:1px solid var(--line);border-radius:8px;padding:0 8px;font:inherit;background:#fff}
-.ws-dlabel select.is-ans,.ws-dlabel input.is-ans{border-color:var(--good);background:var(--goodbg)}
+.ws-dlabel select.is-ans,.ws-dlabel input.is-ans{border:2px solid #2b8a3e;background:#ebfbee;font-weight:700}
 .ws-dlabel select.wrong,.ws-dlabel input.wrong{border-color:var(--bad);background:var(--badbg)}
 .ws-device-arrow{text-align:center;color:var(--mute);font-size:18px;margin:2px 0}
 
-/* order with panel (panelArt: N) */
+/* order with panel (panelArt: N / panelImg) */
 .ws-order-area{display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:start;margin-top:12px}
+.ws-order-area.img{grid-template-columns:190px 1fr}
 .ws-pot-panel{background:var(--soft);border-radius:12px;padding:12px;text-align:center}
 .ws-pot-panel svg{width:100%;height:110px;display:block}
-.ws-pot-panel small{font-size:11px;color:var(--mute);display:block;margin-top:6px}
+.ws-panel-img{width:100%;height:auto;display:block;border-radius:12px}
+.ws-pot-panel small{font-size:11px;color:var(--mute);display:block;margin-top:6px;word-break:keep-all}
 
 /* keyword chips for write blocks */
 .ws-kw-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
 .ws-kw-chip{font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:var(--soft);color:var(--sub);font-weight:600}
 .ws-kw-chip.present{background:var(--sel);border-color:var(--navy);color:var(--navy)}
 
-@media(max-width:640px){.ws-devices{grid-template-columns:1fr}.ws-order-area{grid-template-columns:1fr}.ws-pot-panel{display:none}}
+@media(max-width:640px){.ws-devices,.ws-devices.cols-4{grid-template-columns:1fr}.ws-order-area,.ws-order-area.img{grid-template-columns:1fr}.ws-pot-panel{display:none}}
 
 /* hero header (heroArt on sheet) */
 .ws-intro{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center;margin:6px 0 4px}
