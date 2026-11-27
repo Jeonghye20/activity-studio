@@ -125,7 +125,7 @@ export default function StudentEntryLayout({ step, children }: { step: 1 | 2; ch
           <Logo />
           <div>
             <div style={{ fontSize: 15, fontWeight: 850, letterSpacing: '-.02em', lineHeight: 1.3 }}>
-              수업활동 스튜디오
+              콕정보랩
             </div>
             <div style={{ fontSize: 12, color: '#9aa4bf', lineHeight: 1.4 }}>비상교육</div>
           </div>

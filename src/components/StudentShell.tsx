@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { getStudentActivities, DEMO_TODO } from '@/lib/studentDemoData';
+import SidebarShortcuts from '@/components/SidebarShortcuts';
 
 const LS_KEY = 'activity_studio_student_info';
 
@@ -98,11 +99,12 @@ export default function StudentShell({ code, children }: { code: string; childre
         <Link href={`/s/${code}/home`} className="shell-brand">
           <Logo />
           <div className="shell-brand-text">
-            <b>수업활동 스튜디오</b>
+            <b>콕정보랩</b>
             <small>비상교육</small>
           </div>
         </Link>
 
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         <nav className="shell-nav">
           <NavBtn
             href={`/s/${code}/home`}
@@ -124,6 +126,8 @@ export default function StudentShell({ code, children }: { code: string; childre
             active={active === 'record'}
           />
         </nav>
+          <SidebarShortcuts style={{ marginTop: 'auto' }} />
+        </div>
 
         <div className="shell-foot">
           <Link href="/s" className="shell-preview-btn">

@@ -15,11 +15,13 @@ const FROM_LABEL: Record<string, string> = {
   recent: '최근 나온 활동지',
   spec:   '정보 특화 활동지',
   shared: '선생님들이 공유한 활동',
+  ai:     '인공지능 활동지',
 };
 const FROM_TITLE: Record<string, string> = {
   recent: '최근 나온 활동지 전체',
   spec:   '정보 특화 활동지 전체',
   shared: '선생님들이 공유한 활동 전체',
+  ai:     '인공지능 활동지 전체',
 };
 
 interface Props {
@@ -52,6 +54,10 @@ export default function BrowseClient({ worksheets, unitMap }: Props) {
     }
     if (from === 'shared') {
       return worksheets.filter(w => w.type === 'concept');
+    }
+    if (from === 'ai') {
+      // 인공지능 단원(Ⅳ) 활동지
+      return worksheets.filter(w => w.unit.startsWith('Ⅳ'));
     }
     return worksheets;
   }, [worksheets, from]);

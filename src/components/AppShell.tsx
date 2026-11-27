@@ -12,6 +12,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import SidebarShortcuts from '@/components/SidebarShortcuts';
 
 /* ── 로고 SVG ──────────────────────────────────────────── */
 function Logo() {
@@ -53,13 +54,6 @@ const IconPeople = () => (
     <path d="M16 3.13a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85"/>
   </svg>
 );
-const IconEye = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <rect x="6" y="2" width="12" height="20" rx="2"/>
-    <path d="M11 18h2"/>
-  </svg>
-);
-
 /* ── 활성 섹션 판별 ────────────────────────────────────── */
 function getActiveSection(pathname: string): string {
   if (pathname.startsWith('/my-sheets'))    return '/my-sheets';
@@ -85,12 +79,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <Link href="/home" className="shell-brand">
           <Logo />
           <div className="shell-brand-text">
-            <b>수업활동 스튜디오</b>
+            <b>콕정보랩</b>
             <small>비상교육</small>
           </div>
         </Link>
 
-        {/* 주 메뉴 */}
+        {/* 주 메뉴 + 바로가기 (화면이 낮으면 이 영역만 스크롤) */}
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         <nav className="shell-nav">
           <NavBtn
             href="/home" label="홈" icon={<IconHome />}
@@ -114,15 +109,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
             active={active === '/class-roster'}
           />
         </nav>
+          <SidebarShortcuts style={{ marginTop: 'auto' }} />
+        </div>
 
-
-        {/* 하단: 학생 미리보기 + 프로필 */}
+        {/* 하단: 프로필 */}
         <div className="shell-foot">
-          <Link href="/student-preview" className="shell-preview-btn">
-            <IconEye />
-            학생 화면 미리보기
-          </Link>
-
           <div className="shell-me">
             <span
               style={{
